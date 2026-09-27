@@ -1,0 +1,627 @@
+<title>Home Panel Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@300;400;600&display=swap">
+<style>
+:root{
+  --ground:#e9edea; --surface:#f8faf8; --surface-2:#dfe5e1; --line:#cbd4ce;
+  --ink:#18211d; --muted:#56635d; --faint:#7d8983;
+  --glow:#e39b2d; --glow-soft:#f7e2bd; --glow-ink:#5a3a07;
+  --teal:#1c6b62; --teal-soft:#cfe5e0;
+  --bad:#b3372c; --bad-soft:#f5d9d5; --warn:#9a6a00; --warn-soft:#f6e8c3; --ok:#2d7a4b;
+  --cam:#1d2421; --cam-ink:#c9d3ce;
+  --shadow:0 1px 2px rgba(20,35,28,.06),0 4px 14px rgba(20,35,28,.06);
+  --r:14px;
+  --display:"Sora",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --ground:#101513; --surface:#18201c; --surface-2:#222c27; --line:#2f3a34;
+  --ink:#e4ebe7; --muted:#9aa8a1; --faint:#6f7c76;
+  --glow:#f0ab45; --glow-soft:#3d2c12; --glow-ink:#ffd697;
+  --teal:#5cb8aa; --teal-soft:#16332e;
+  --bad:#ef7d70; --bad-soft:#3a1b18; --warn:#e7b94c; --warn-soft:#352a10; --ok:#6cc58f;
+  --cam:#0a0e0c; --cam-ink:#aebbb4; --shadow:none;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#101513; --surface:#18201c; --surface-2:#222c27; --line:#2f3a34;
+  --ink:#e4ebe7; --muted:#9aa8a1; --faint:#6f7c76;
+  --glow:#f0ab45; --glow-soft:#3d2c12; --glow-ink:#ffd697;
+  --teal:#5cb8aa; --teal-soft:#16332e;
+  --bad:#ef7d70; --bad-soft:#3a1b18; --warn:#e7b94c; --warn-soft:#352a10; --ok:#6cc58f;
+  --cam:#0a0e0c; --cam-ink:#aebbb4; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ground)}
+body{color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:88px minmax(0,1fr);min-height:100vh}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;align-items:center;gap:6px;padding-block:20px;border-right:1px solid var(--line);background:var(--surface)}
+.rail .mark{font:600 13px var(--display);letter-spacing:.08em;color:var(--teal);margin-bottom:14px}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;width:68px;padding:10px 0;border:0;border-radius:12px;background:none;color:var(--muted);font-size:11.5px;font-weight:500}
+.nav-btn svg{width:22px;height:22px}
+.nav-btn[aria-current="page"]{background:var(--teal-soft);color:var(--teal)}
+main{padding:24px 28px 48px;min-width:0}
+
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:20px}
+.clock{font:300 44px/1 var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.date{color:var(--muted);margin-top:6px}
+.proto{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;padding:6px 12px;border-radius:999px;border:1px dashed var(--line);color:var(--muted);font-size:12.5px}
+.proto b{color:var(--ink);font-weight:600}
+h1.view-title{font:400 28px/1.15 var(--display);margin:0;text-wrap:balance}
+h2{font:600 12px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 .count{font-weight:500;color:var(--faint);letter-spacing:0}
+
+.attention{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:500;border:0;text-align:left}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.info{background:var(--surface-2);color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+
+.sections{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:26px 22px}
+.sec{grid-column:span 12;min-width:0}
+@media (min-width:700px){.sec.half{grid-column:span 6}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.slim{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:12px 16px;margin-top:10px}
+.slim .v{font:400 24px var(--display);font-variant-numeric:tabular-nums}
+.mrow{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 12px;padding:11px 14px}
+.mrow .nm{font-weight:600;overflow-wrap:anywhere}
+.mrow input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--teal)}
+.mrow .badge{position:static;margin-left:6px;vertical-align:1px}
+.showmore{margin-top:10px}
+.foot{margin-top:28px;font-size:12.5px;color:var(--faint);max-width:70ch}
+.room-label{font-size:12.5px;color:var(--faint);margin:12px 0 6px;font-weight:500}
+.room-label:first-child{margin-top:0}
+
+.tile{position:relative;display:flex;flex-direction:column;gap:6px;min-height:92px;padding:12px 13px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);text-align:left;min-width:0}
+button.tile{transition:background .15s,border-color .15s}
+.tile .nm{font-weight:500;line-height:1.25;overflow-wrap:anywhere}
+.tile .st{font-size:12.5px;color:var(--muted)}
+.tile .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted)}
+.tile .ic svg{width:16px;height:16px}
+.tile.on{background:var(--glow-soft);border-color:transparent}
+.tile.on .ic{background:var(--glow);color:#fff}
+.tile.on .st{color:var(--glow-ink)}
+.tile.na{opacity:.55;border-style:dashed;box-shadow:none;cursor:not-allowed}
+.tile.na .st{color:var(--bad)}
+.tile input[type=range]{width:100%;accent-color:var(--glow)}
+.badge{position:absolute;top:9px;right:9px;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.badge.un{background:var(--surface-2);color:var(--muted)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);min-width:0}
+.thermo{display:grid;gap:12px}
+.thermo .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.big{font:300 46px/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.big small{font-size:18px;color:var(--muted);margin-left:2px}
+.setp{display:flex;align-items:center;gap:10px}
+.round{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);font-size:20px;line-height:1}
+.setp .v{font:400 22px var(--display);min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:8px;font-size:13px;color:var(--muted);text-transform:capitalize}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--teal);font-weight:600;box-shadow:var(--shadow)}
+.meta{font-size:12.5px;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 13px;font-size:13.5px;font-weight:500}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+select{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:7px 10px;font-size:13.5px;max-width:100%}
+.confirm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:13px}
+
+.cams{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.cam{border:0;padding:0;border-radius:var(--r);overflow:hidden;background:var(--cam);color:var(--cam-ink);text-align:left;position:relative;display:block;width:100%}
+.cam .feed{aspect-ratio:16/9;max-width:100%;display:grid;place-items:center;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 4px),radial-gradient(120% 90% at 30% 20%,#2a3530,var(--cam));font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.cam.off .feed{background:repeating-linear-gradient(135deg,#1a1f1d 0 10px,#151917 10px 20px);color:#8c6d6a}
+.cam .cap{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;background:rgba(0,0,0,.35)}
+.cam .cap b{font-weight:500;color:#eef3f0;font-size:13.5px;overflow-wrap:anywhere}
+.cam .cap span{font-size:11.5px;white-space:nowrap}
+.cam .cap span{color:#aab7b0}
+.cam .cstat{position:absolute;top:8px;left:8px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.55);color:#8fe0aa}
+.cam.off .cstat{color:#ff9d91}
+.cam .badge{top:8px;right:8px}
+.strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:4px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.strip>.cam{flex:0 0 min(44%,360px);scroll-snap-align:start}
+.strip-count{font-size:12px;color:var(--faint);margin-top:6px;font-variant-numeric:tabular-nums}
+#swipezone{touch-action:pan-y;user-select:none}
+.drawer{overscroll-behavior:contain}
+.camnav{display:flex;align-items:center;gap:8px}
+.locktile{display:grid;gap:10px;padding:12px 14px}
+.lockrow{display:flex;align-items:center;gap:12px}
+.lock-ic{flex:none;width:44px;height:44px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--surface-2);color:var(--muted)}
+.lock-ic .ic{background:none;color:inherit;width:auto;height:auto}
+.lock-ic svg{width:22px;height:22px}
+.lock-ic.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.lock-ic.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.lock-ic.warn{background:var(--warn-soft);color:var(--warn)}
+.lock-body{all:unset;cursor:pointer;display:grid;gap:2px;flex:1;min-width:0}
+.lock-body .nm{font-weight:600}
+.lock-body .st{font-size:13px;color:var(--muted)}
+.lock-body:focus-visible,.lock-ic:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.hbadges{display:inline-flex;gap:6px;margin-left:auto;text-transform:none;letter-spacing:0}
+.hbadge{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 9px 2px 4px;font:500 12px var(--body);color:var(--ink)}
+.hbadge .ic{width:18px;height:18px;background:none}
+.hbadge svg{width:14px;height:14px}
+.camnav span{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
+
+.car{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:end}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.bar.low i{background:var(--warn)}
+.ink{display:grid;grid-template-columns:70px 1fr 40px;gap:8px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;scrollbar-width:thin}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:13.5px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.chip .n{opacity:.6;margin-left:4px;font-variant-numeric:tabular-nums}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.filters input[type=search]{flex:1 1 220px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;min-width:0}
+.filters label{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:1000px}
+th,td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--surface)}
+td code{font:12px var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.av{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.av.available{color:var(--ok)}.av.unavailable{color:var(--bad)}.av.unknown{color:var(--warn)}
+.flag{color:var(--warn);font-size:12.5px}
+.note{font-size:13px;color:var(--muted);max-width:70ch;margin:0 0 14px}
+
+.drawer-bg{position:fixed;inset:0;background:rgba(10,14,12,.5);z-index:20}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:min(440px,100%);background:var(--ground);z-index:21;overflow-y:auto;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(24px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;align-content:start;border-left:1px solid var(--line)}
+.drawer header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.drawer h3{font:400 22px/1.2 var(--display);margin:0}
+.drawer code{font:12px var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.ptz{display:grid;grid-template-columns:repeat(3,52px);gap:6px;justify-content:start}
+.ptz button{height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--ground);padding:10px 16px;border-radius:12px;font-size:13px;z-index:30;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.toast code{font-family:var(--mono);font-size:12px;opacity:.85}
+
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border-right:0;border-top:1px solid var(--line);z-index:10}
+  .rail .mark{display:none}
+  .nav-btn{width:auto;flex:1;padding:8px 0}
+  main{padding:18px 16px calc(96px + env(safe-area-inset-bottom,0px))}
+  .clock{font-size:36px}
+  .top{margin-bottom:14px}
+  .attention{gap:6px;margin-bottom:22px}
+  .pill{font-size:12.5px;padding:6px 10px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .tile{min-height:74px;padding:10px 11px;gap:4px}
+  .cams{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .cam .feed{font-size:10px}
+  .cam .cap{padding:7px 9px}
+  .cam .cap b{font-size:12.5px}
+  .strip>.cam{flex-basis:82%}
+  .cam .cstat{font-size:10.5px;padding:2px 6px}
+  .cam .badge{font-size:10.5px;padding:2px 6px}
+  .big{font-size:40px}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Views">
+    <div class="mark">HOME</div>
+    <button class="nav-btn" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg>Home</button>
+    <button class="nav-btn" data-view="rooms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 12h9V3.5M12.5 12v8.5"/></svg>Rooms</button>
+    <button class="nav-btn" data-view="cameras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6.5" width="13" height="11" rx="2"/><path d="m16 10.5 5-3v9l-5-3"/></svg>Cameras</button>
+    <button class="nav-btn" data-view="inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>Inventory</button>
+  </nav>
+  <main id="main"></main>
+</div>
+<div id="overlay"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const DATA = {"meta": {"generated": "2026-09-26T18:48:50Z", "ha_version": "2026.9.3", "counts": {"areas": 11, "floors": 1, "devices": 82, "registry_entities": 919, "state_entities": 441, "inventory_rows": 921}, "disabled_cameras": 30, "sensitive_hidden": 18, "areas": ["Living Room", "Kitchen", "Bedroom", "Great Room", "Basement", "Driveway", "Back Deck", "Front Gate", "Front Yard", "Garage", "Office"]}, "entities": [{"id": "binary_sensor.basement_basement_cam_animal", "name": "Basement Cam Animal", "label": "Basement Cam Animal", "dup": false, "domain": "binary_sensor", "room": "Basement", "role": "status", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.basement_basement_cam_baby_crying", "name": "Basement Cam Baby crying", "label": "Basement Cam Baby Crying", "dup": false, "domain": "binary_sensor", "room": "Basement", "role": "status", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.basement_basement_cam_motion", "name": "Basement Cam Motion", "label": "Basement Cam Motion", "dup": false, "domain": "binary_sensor", "room": "Basement", "role": "status", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.basement_basement_cam_person", "name": "Basement Cam Person", "label": "Basement Cam Person", "dup": false, "domain": "binary_sensor", "room": "Basement", "role": "status", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.bedroom_sensor_occupancy", "name": "Sensor Occupancy", "label": "Sensor Occupancy", "dup": false, "domain": "binary_sensor", "room": "Bedroom", "role": "status", "device": "Sensor", "model": "ecobee Room Sensor", "integration": "ecobee", "features": [], "caps": {"device_class": "occupancy"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.front_door_door", "name": "Front Door Door", "label": "Front Door Door", "dup": false, "domain": "binary_sensor", "room": "Great Room", "role": "status", "device": "Front Door", "model": "PGK728WRHK", "integration": "lockly", "features": [], "caps": {"device_class": "door"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.front_gate_motion", "name": "Homesite Back Deck Motion", "label": "Homesite Back Deck Motion", "dup": false, "domain": "binary_sensor", "room": "Front Gate", "role": "status", "device": "Homesite Back Deck", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "Name says “Homesite Back Deck”, area is Front Gate", "demo": "unavailable"}, {"id": "binary_sensor.front_gate_person", "name": "Homesite Back Deck Person", "label": "Homesite Back Deck Person", "dup": false, "domain": "binary_sensor", "room": "Front Gate", "role": "status", "device": "Homesite Back Deck", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "Name says “Homesite Back Deck”, area is Front Gate", "demo": "unavailable"}, {"id": "binary_sensor.front_gate_vehicle", "name": "Homesite Back Deck Vehicle", "label": "Homesite Back Deck Vehicle", "dup": false, "domain": "binary_sensor", "room": "Front Gate", "role": "status", "device": "Homesite Back Deck", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "Name says “Homesite Back Deck”, area is Front Gate", "demo": "unavailable"}, {"id": "binary_sensor.front_yard_animal", "name": "Front Yard Animal", "label": "Front Yard Animal", "dup": false, "domain": "binary_sensor", "room": "Unassigned", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.front_yard_motion", "name": "Front Yard Motion", "label": "Front Yard Motion", "dup": false, "domain": "binary_sensor", "room": "Front Yard", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "binary_sensor.front_yard_motion_2", "name": "Front Yard Motion", "label": "Front Yard Motion", "dup": false, "domain": "binary_sensor", "room": "Unassigned", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "Possible duplicate of binary_sensor.front_yard_motion; has no area", "demo": "off"}, {"id": "binary_sensor.front_yard_person", "name": "Front Yard Person", "label": "Front Yard Person", "dup": false, "domain": "binary_sensor", "room": "Front Yard", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "binary_sensor.front_yard_person_2", "name": "Front Yard Person", "label": "Front Yard Person", "dup": false, "domain": "binary_sensor", "room": "Unassigned", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "Possible duplicate of binary_sensor.front_yard_person; has no area", "demo": "off"}, {"id": "binary_sensor.front_yard_vehicle", "name": "Front Yard Vehicle", "label": "Front Yard Vehicle", "dup": false, "domain": "binary_sensor", "room": "Front Yard", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "binary_sensor.front_yard_vehicle_2", "name": "Front Yard Vehicle", "label": "Front Yard Vehicle", "dup": false, "domain": "binary_sensor", "room": "Unassigned", "role": "status", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "Possible duplicate of binary_sensor.front_yard_vehicle; has no area", "demo": "off"}, {"id": "binary_sensor.great_room_great_room_cam_animal", "name": "Great Room Cam Animal", "label": "Great Room Cam Animal", "dup": false, "domain": "binary_sensor", "room": "Great Room", "role": "status", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.great_room_great_room_cam_baby_crying", "name": "Great Room Cam Baby crying", "label": "Great Room Cam Baby Crying", "dup": false, "domain": "binary_sensor", "room": "Great Room", "role": "status", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.great_room_great_room_cam_motion", "name": "Great Room Cam Motion", "label": "Great Room Cam Motion", "dup": false, "domain": "binary_sensor", "room": "Great Room", "role": "status", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.great_room_great_room_cam_person", "name": "Great Room Cam Person", "label": "Great Room Cam Person", "dup": false, "domain": "binary_sensor", "room": "Great Room", "role": "status", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.homesite_back_deck_motion", "name": "Homesite Driveway Motion", "label": "Homesite Driveway Motion", "dup": false, "domain": "binary_sensor", "room": "Driveway", "role": "status", "device": "Homesite Driveway", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "ID says back deck, name says “Homesite Driveway”", "demo": "unavailable"}, {"id": "binary_sensor.homesite_back_deck_person", "name": "Homesite Driveway Person", "label": "Homesite Driveway Person", "dup": false, "domain": "binary_sensor", "room": "Driveway", "role": "status", "device": "Homesite Driveway", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "ID says back deck, name says “Homesite Driveway”", "demo": "unavailable"}, {"id": "binary_sensor.homesite_back_deck_vehicle", "name": "Homesite Driveway Vehicle", "label": "Homesite Driveway Vehicle", "dup": false, "domain": "binary_sensor", "room": "Driveway", "role": "status", "device": "Homesite Driveway", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "ID says back deck, name says “Homesite Driveway”", "demo": "unavailable"}, {"id": "binary_sensor.homesite_driveway_motion", "name": "Front Gate Motion", "label": "Front Gate Motion", "dup": false, "domain": "binary_sensor", "room": "Driveway", "role": "status", "device": "Front Gate", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "ID says driveway, name says “Front Gate”", "demo": "unavailable"}, {"id": "binary_sensor.homesite_driveway_person", "name": "Front Gate Person", "label": "Front Gate Person", "dup": false, "domain": "binary_sensor", "room": "Driveway", "role": "status", "device": "Front Gate", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "ID says driveway, name says “Front Gate”", "demo": "unavailable"}, {"id": "binary_sensor.homesite_driveway_vehicle", "name": "Front Gate Vehicle", "label": "Front Gate Vehicle", "dup": false, "domain": "binary_sensor", "room": "Driveway", "role": "status", "device": "Front Gate", "model": "Unknown", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "unavailable", "flag": "ID says driveway, name says “Front Gate”", "demo": "unavailable"}, {"id": "binary_sensor.living_room_living_room_cam_animal", "name": "Living Room Cam Animal", "label": "Living Room Cam Animal", "dup": false, "domain": "binary_sensor", "room": "Living Room", "role": "status", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.living_room_living_room_cam_baby_crying", "name": "Living Room Cam Baby crying", "label": "Living Room Cam Baby Crying", "dup": false, "domain": "binary_sensor", "room": "Living Room", "role": "status", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.living_room_living_room_cam_motion", "name": "Living Room Cam Motion", "label": "Living Room Cam Motion", "dup": false, "domain": "binary_sensor", "room": "Living Room", "role": "status", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.living_room_living_room_cam_person", "name": "Living Room Cam Person", "label": "Living Room Cam Person", "dup": false, "domain": "binary_sensor", "room": "Living Room", "role": "status", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {"device_class": "motion"}, "avail": "available", "flag": "", "demo": "off"}, {"id": "binary_sensor.living_room_thermostat_occupancy", "name": "Thermostat Occupancy", "label": "Thermostat Occupancy", "dup": false, "domain": "binary_sensor", "room": "Living Room", "role": "status", "device": "Thermostat", "model": "ecobee4 Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"device_class": "occupancy"}, "avail": "available", "flag": "", "demo": "on"}, {"id": "button.basement_basement_cam_guard_go_to", "name": "Basement Cam Guard go to", "label": "Basement Cam Guard Go To", "dup": false, "domain": "button", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.basement_basement_cam_ptz_down", "name": "Basement Cam PTZ down", "label": "Basement Cam PTZ Down", "dup": false, "domain": "button", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.basement_basement_cam_ptz_left", "name": "Basement Cam PTZ left", "label": "Basement Cam PTZ Left", "dup": false, "domain": "button", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.basement_basement_cam_ptz_right", "name": "Basement Cam PTZ right", "label": "Basement Cam PTZ Right", "dup": false, "domain": "button", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.basement_basement_cam_ptz_stop", "name": "Basement Cam PTZ stop", "label": "Basement Cam PTZ Stop", "dup": false, "domain": "button", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.basement_basement_cam_ptz_up", "name": "Basement Cam PTZ up", "label": "Basement Cam PTZ Up", "dup": false, "domain": "button", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.great_room_great_room_cam_guard_go_to", "name": "Great Room Cam Guard go to", "label": "Great Room Cam Guard Go To", "dup": false, "domain": "button", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.great_room_great_room_cam_ptz_down", "name": "Great Room Cam PTZ down", "label": "Great Room Cam PTZ Down", "dup": false, "domain": "button", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.great_room_great_room_cam_ptz_left", "name": "Great Room Cam PTZ left", "label": "Great Room Cam PTZ Left", "dup": false, "domain": "button", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.great_room_great_room_cam_ptz_right", "name": "Great Room Cam PTZ right", "label": "Great Room Cam PTZ Right", "dup": false, "domain": "button", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.great_room_great_room_cam_ptz_stop", "name": "Great Room Cam PTZ stop", "label": "Great Room Cam PTZ Stop", "dup": false, "domain": "button", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.great_room_great_room_cam_ptz_up", "name": "Great Room Cam PTZ up", "label": "Great Room Cam PTZ Up", "dup": false, "domain": "button", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_living_room_cam_guard_go_to", "name": "Living Room Cam Guard go to", "label": "Living Room Cam Guard Go To", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_living_room_cam_ptz_down", "name": "Living Room Cam PTZ down", "label": "Living Room Cam PTZ Down", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_living_room_cam_ptz_left", "name": "Living Room Cam PTZ left", "label": "Living Room Cam PTZ Left", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_living_room_cam_ptz_right", "name": "Living Room Cam PTZ right", "label": "Living Room Cam PTZ Right", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_living_room_cam_ptz_stop", "name": "Living Room Cam PTZ stop", "label": "Living Room Cam PTZ Stop", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_living_room_cam_ptz_up", "name": "Living Room Cam PTZ up", "label": "Living Room Cam PTZ Up", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "button.living_room_vacuum_full_cleaning", "name": "Vacuum Full Cleaning", "label": "Vacuum Full Cleaning", "dup": false, "domain": "button", "room": "Living Room", "role": "control", "device": "Vacuum", "model": "roborock.vacuum.a38", "integration": "roborock", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "camera.backyard", "name": "Backyard", "label": "Backyard", "dup": false, "domain": "camera", "room": "Back Deck", "role": "camera", "device": "Backyard", "model": "Security Camera", "integration": "tuya", "features": ["stream"], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "camera.basement_basement_cam_fluent", "name": "Basement Cam Fluent", "label": "Basement Cam", "dup": false, "domain": "camera", "room": "Basement", "role": "camera", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "camera.front_gate_fluent", "name": "Homesite Back Deck Fluent", "label": "Homesite Back Deck", "dup": false, "domain": "camera", "room": "Front Gate", "role": "camera", "device": "Homesite Back Deck", "model": "Unknown", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "unavailable", "flag": "Name says “Homesite Back Deck”, area is Front Gate", "demo": "unavailable"}, {"id": "camera.front_yard_fluent", "name": "Front Yard Fluent", "label": "Front Yard", "dup": false, "domain": "camera", "room": "Front Yard", "role": "camera", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "unavailable", "flag": "Possible duplicate of camera.front_yard_fluent_2 (this one is offline)", "demo": "unavailable"}, {"id": "camera.front_yard_fluent_2", "name": "Front Yard Fluent", "label": "Front Yard", "dup": false, "domain": "camera", "room": "Unassigned", "role": "camera", "device": "Front Yard", "model": "B800", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "available", "flag": "Possible duplicate of camera.front_yard_fluent; has no area", "demo": "available"}, {"id": "camera.great_room_great_room_cam_fluent", "name": "Great Room Cam Fluent", "label": "Great Room Cam", "dup": false, "domain": "camera", "room": "Great Room", "role": "camera", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "camera.homesite_back_deck_fluent", "name": "Driveway", "label": "Driveway", "dup": false, "domain": "camera", "room": "Driveway", "role": "camera", "device": "Homesite Driveway", "model": "Unknown", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "unavailable", "flag": "ID says back deck, name says “Driveway”, area is Driveway", "demo": "unavailable"}, {"id": "camera.homesite_driveway_fluent", "name": "Front Gate Fluent", "label": "Front Gate", "dup": false, "domain": "camera", "room": "Driveway", "role": "camera", "device": "Front Gate", "model": "Unknown", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "unavailable", "flag": "ID says driveway, name says “Front Gate”, area is Driveway", "demo": "unavailable"}, {"id": "camera.living_room_living_room_cam_fluent", "name": "Living Room Cam Fluent", "label": "Living Room Cam", "dup": false, "domain": "camera", "room": "Living Room", "role": "camera", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": ["stream"], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "climate.great_room_thermostat", "name": "Thermostat", "label": "Thermostat", "dup": false, "domain": "climate", "room": "Great Room", "role": "control", "device": "Thermostat ", "model": "ecobee3 lite Smart Thermostat", "integration": "ecobee", "features": ["target_temperature", "target_temperature_range", "fan_mode", "preset_mode", "turn_off", "turn_on"], "caps": {"hvac_modes": ["heat", "off"], "fan_modes": ["auto", "on"], "preset_modes": ["away", "home", "sleep", "away_indefinitely"], "min_temp": 44.6, "max_temp": 95.0}, "avail": "available", "flag": "", "demo": "heat"}, {"id": "climate.living_room_thermostat", "name": "Thermostat", "label": "Thermostat", "dup": false, "domain": "climate", "room": "Living Room", "role": "control", "device": "Thermostat", "model": "ecobee4 Smart Thermostat", "integration": "ecobee", "features": ["target_temperature", "target_temperature_range", "fan_mode", "preset_mode", "turn_off", "turn_on"], "caps": {"hvac_modes": ["cool", "off"], "fan_modes": ["auto", "on"], "preset_modes": ["home", "away", "sleep", "away_indefinitely"], "min_temp": 44.6, "max_temp": 95.0}, "avail": "available", "flag": "", "demo": "cool"}, {"id": "light.backyard_cam_floodlight", "name": "Backyard Cam Floodlight", "label": "Backyard Cam Floodlight", "dup": false, "domain": "light", "room": "Back Deck", "role": "control", "device": "Backyard Cam", "model": "", "integration": "tuya_local", "features": [], "caps": {"supported_color_modes": ["brightness"]}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "light.backyard_floodlight", "name": "Backyard Floodlight", "label": "Backyard Floodlight", "dup": false, "domain": "light", "room": "Back Deck", "role": "control", "device": "Backyard", "model": "Security Camera", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["brightness"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.basement_entry", "name": "Basement Entry", "label": "Basement Entry", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "Basement Entry", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "light.bedroom_hallway_light", "name": "Bedroom Hallway light", "label": "Bedroom Hallway Light", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "Bedroom Hallway light", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "light.guest_room_hallway_light", "name": "Guest Room Hallway Light", "label": "Guest Room Hallway Light", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "Guest Room Hallway Light", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "light.kitchen_kitchen_island_pendants", "name": "Kitchen Island Pendants", "label": "Kitchen Island Pendants", "dup": false, "domain": "light", "room": "Kitchen", "role": "control", "device": "Kitchen Island Pendants", "model": "DVRF-6L (DivaSmartDimmer)", "integration": "lutron_caseta", "features": ["transition"], "caps": {"supported_color_modes": ["brightness"]}, "avail": "available", "flag": "", "demo": "on"}, {"id": "light.kitchen_kitchen_main_lights_2", "name": "Kitchen Main Lights 2", "label": "Kitchen Main Lights 2", "dup": false, "domain": "light", "room": "Kitchen", "role": "control", "device": "Kitchen Main Lights 2", "model": "DVRF-6L (DivaSmartDimmer)", "integration": "lutron_caseta", "features": ["transition"], "caps": {"supported_color_modes": ["brightness"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.kitchen_kitchen_main_lights_zone1", "name": "Kitchen Main Lights Zone1", "label": "Kitchen Main Lights Zone1", "dup": false, "domain": "light", "room": "Kitchen", "role": "control", "device": "Kitchen Main Lights Zone1", "model": "DVRF-6L (DivaSmartDimmer)", "integration": "lutron_caseta", "features": ["transition"], "caps": {"supported_color_modes": ["brightness"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.laundry_light_1", "name": "Laundry light 1", "label": "Laundry Light 1", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "Laundry light 1", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.laundry_light_2", "name": "Laundry light 2", "label": "Laundry Light 2", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "Laundry light 2", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.laundry_light_3", "name": "laundry light 3", "label": "Laundry Light 3", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "laundry light 3", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "light.laundry_light_4", "name": "laundry light 4", "label": "Laundry Light 4", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "laundry light 4", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.laundry_light_5", "name": "laundry light 5", "label": "Laundry Light 5", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "laundry light 5", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.laundry_light_6", "name": "laundry light 6", "label": "Laundry Light 6", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "laundry light 6", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "available", "flag": "", "demo": "off"}, {"id": "light.living_room_lamp", "name": "living Room Lamp", "label": "Living Room Lamp", "dup": false, "domain": "light", "room": "Unassigned", "role": "control", "device": "living Room Lamp", "model": "Bulb-RGBW-A", "integration": "tuya", "features": [], "caps": {"supported_color_modes": ["hs", "white"]}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "light.living_room_living_room_main_lights", "name": "Living Room Main Lights", "label": "Living Room Main Lights", "dup": false, "domain": "light", "room": "Living Room", "role": "control", "device": "Living Room Main Lights", "model": "DVRF-6L (DivaSmartDimmer)", "integration": "lutron_caseta", "features": ["transition"], "caps": {"supported_color_modes": ["brightness"]}, "avail": "available", "flag": "", "demo": "on"}, {"id": "lock.front_door", "name": "Front Door", "label": "Front Door", "dup": false, "domain": "lock", "room": "Great Room", "role": "control", "device": "Front Door", "model": "PGK728WRHK", "integration": "lockly", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "locked"}, {"id": "media_player.great_room_sony_tv", "name": "Sony Tv", "label": "Sony TV", "dup": false, "domain": "media_player", "room": "Great Room", "role": "control", "device": "Sony Tv", "model": "", "integration": "braviatv", "features": ["pause", "volume_set", "volume_mute", "previous_track", "next_track", "turn_on", "turn_off", "play_media", "volume_step", "select_source", "stop", "play", "browse_media"], "caps": {"device_class": "tv", "source_list": ["PlayStation 4", "Signa S3", "HDMI 1", "HDMI 2", "HDMI 3 (eARC/ARC)", "HDMI 4", "Video"]}, "avail": "available", "flag": "Same TV also appears as sony_tv, sony_tv_2 and sony_tv_3; those are grouped here", "demo": "playing"}, {"id": "media_player.greatroom_display", "name": "Greatroom Display", "label": "Greatroom Display", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Greatroom Display", "model": "Google Nest Hub", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "media_player.home_sync", "name": "Home Sync", "label": "Home Sync", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Home Sync", "model": "Google Cast Group", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {"device_class": "speaker"}, "avail": "available", "flag": "", "demo": "idle"}, {"id": "media_player.kitchen_display", "name": "Kitchen display", "label": "Kitchen Display", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Kitchen display", "model": "Google Nest Hub Max", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {}, "avail": "available", "flag": "", "demo": "idle"}, {"id": "media_player.master_bedroom_speaker", "name": "Master Bedroom Speaker", "label": "Master Bedroom Speaker", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Master Bedroom Speaker", "model": "Google Home Mini", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {"device_class": "speaker"}, "avail": "available", "flag": "", "demo": "idle"}, {"id": "media_player.office_speaker", "name": "Office Speaker", "label": "Office Speaker", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Office Speaker", "model": "Google Home Mini", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {"device_class": "speaker"}, "avail": "available", "flag": "", "demo": "idle"}, {"id": "media_player.samsung_tv", "name": "Samsung TV", "label": "Samsung TV", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Samsung TV", "model": "Chromecast Ultra", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {}, "avail": "available", "flag": "", "demo": "idle"}, {"id": "media_player.sony_tv", "name": "Sony TV", "label": "Sony TV", "dup": true, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Sony TV", "model": "BRAVIA 4K VH21", "integration": "cast", "features": ["pause", "seek", "volume_set", "volume_mute", "previous_track", "next_track", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {}, "avail": "available", "flag": "One of 4 Sony TV players; may be the same TV", "demo": "idle"}, {"id": "media_player.sony_tv_2", "name": "Sony TV", "label": "Sony TV", "dup": true, "domain": "media_player", "room": "Great Room", "role": "control", "device": "Sony TV", "model": "BRAVIA 4K VH21", "integration": "androidtv_remote", "features": ["pause", "volume_mute", "previous_track", "next_track", "turn_on", "turn_off", "play_media", "volume_step", "stop", "play", "browse_media"], "caps": {"device_class": "tv"}, "avail": "available", "flag": "One of 4 Sony TV players; may be the same TV", "demo": "idle"}, {"id": "media_player.sony_tv_3", "name": "Sony TV", "label": "Sony TV", "dup": true, "domain": "media_player", "room": "Great Room", "role": "control", "device": "Sony TV", "model": "MediaRenderer", "integration": "dlna_dmr", "features": ["pause", "seek", "volume_set", "volume_mute", "previous_track", "next_track", "play_media", "stop", "play", "shuffle_set", "select_sound_mode", "browse_media"], "caps": {}, "avail": "available", "flag": "One of 4 Sony TV players; may be the same TV", "demo": "idle"}, {"id": "media_player.soundbar", "name": "Soundbar", "label": "Soundbar", "dup": false, "domain": "media_player", "room": "Unassigned", "role": "control", "device": "Soundbar", "model": "Polk Signa S3", "integration": "cast", "features": ["pause", "volume_set", "volume_mute", "turn_on", "turn_off", "play_media", "stop", "play", "browse_media"], "caps": {"device_class": "speaker"}, "avail": "available", "flag": "", "demo": "playing"}, {"id": "number.great_room_thermostat_fan_minimum_on_time", "name": "Thermostat  Fan minimum on time", "label": "Thermostat Fan Minimum On Time", "dup": false, "domain": "number", "room": "Great Room", "role": "control", "device": "Thermostat ", "model": "ecobee3 lite Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"unit_of_measurement": "min"}, "avail": "available", "flag": "", "demo": "available"}, {"id": "number.living_room_living_room_cam_focus", "name": "Living Room Cam Focus", "label": "Living Room Cam Focus", "dup": false, "domain": "number", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "number.living_room_living_room_cam_zoom", "name": "Living Room Cam Zoom", "label": "Living Room Cam Zoom", "dup": false, "domain": "number", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "number.living_room_thermostat_fan_minimum_on_time", "name": "Thermostat Fan minimum on time", "label": "Thermostat Fan Minimum On Time", "dup": false, "domain": "number", "room": "Living Room", "role": "control", "device": "Thermostat", "model": "ecobee4 Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"unit_of_measurement": "min"}, "avail": "available", "flag": "", "demo": "available"}, {"id": "remote.great_room_sony_tv", "name": "Sony Tv", "label": "Sony TV", "dup": false, "domain": "remote", "room": "Great Room", "role": "control", "device": "Sony Tv", "model": "", "integration": "braviatv", "features": [], "caps": {}, "avail": "available", "flag": "Two remotes for what may be one TV", "demo": "available"}, {"id": "remote.sony_tv", "name": "Sony TV", "label": "Sony TV", "dup": true, "domain": "remote", "room": "Great Room", "role": "control", "device": "Sony TV", "model": "BRAVIA 4K VH21", "integration": "androidtv_remote", "features": ["activity"], "caps": {}, "avail": "available", "flag": "Two remotes for what may be one TV", "demo": "available"}, {"id": "sensor.bedroom_sensor_temperature", "name": "Sensor Temperature", "label": "Sensor Temperature", "dup": false, "domain": "sensor", "room": "Bedroom", "role": "status", "device": "Sensor", "model": "ecobee Room Sensor", "integration": "ecobee", "features": [], "caps": {"device_class": "temperature", "unit_of_measurement": "°F"}, "avail": "available", "flag": "", "demo": "68.4"}, {"id": "sensor.epson_et_2850_series", "name": "EPSON ET-2850 Series", "label": "EPSON ET-2850 Series", "dup": false, "domain": "sensor", "room": "Office", "role": "status", "device": "EPSON ET-2850 Series", "model": "ET-2850 Series", "integration": "ipp", "features": [], "caps": {"device_class": "enum"}, "avail": "available", "flag": "", "demo": "Idle"}, {"id": "sensor.epson_et_2850_series_black_ink", "name": "EPSON ET-2850 Series Black ink", "label": "EPSON ET-2850 Series Black Ink", "dup": false, "domain": "sensor", "room": "Office", "role": "status", "device": "EPSON ET-2850 Series", "model": "ET-2850 Series", "integration": "ipp", "features": [], "caps": {"unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "64"}, {"id": "sensor.epson_et_2850_series_cyan_ink", "name": "EPSON ET-2850 Series Cyan ink", "label": "EPSON ET-2850 Series Cyan Ink", "dup": false, "domain": "sensor", "room": "Office", "role": "status", "device": "EPSON ET-2850 Series", "model": "ET-2850 Series", "integration": "ipp", "features": [], "caps": {"unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "38"}, {"id": "sensor.epson_et_2850_series_magenta_ink", "name": "EPSON ET-2850 Series Magenta ink", "label": "EPSON ET-2850 Series Magenta Ink", "dup": false, "domain": "sensor", "room": "Office", "role": "status", "device": "EPSON ET-2850 Series", "model": "ET-2850 Series", "integration": "ipp", "features": [], "caps": {"unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "52"}, {"id": "sensor.epson_et_2850_series_yellow_ink", "name": "EPSON ET-2850 Series Yellow ink", "label": "EPSON ET-2850 Series Yellow Ink", "dup": false, "domain": "sensor", "room": "Office", "role": "status", "device": "EPSON ET-2850 Series", "model": "ET-2850 Series", "integration": "ipp", "features": [], "caps": {"unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "17"}, {"id": "sensor.front_door_battery", "name": "Front Door Battery", "label": "Front Door Battery", "dup": false, "domain": "sensor", "room": "Great Room", "role": "status", "device": "Front Door", "model": "PGK728WRHK", "integration": "lockly", "features": [], "caps": {"device_class": "battery", "unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "100"}, {"id": "sensor.front_door_last_access", "name": "Front Door Last Access", "label": "Front Door Last Access", "dup": false, "domain": "sensor", "room": "Great Room", "role": "status", "device": "Front Door", "model": "PGK728WRHK", "integration": "lockly", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.great_room_thermostat_humidity", "name": "Thermostat  Humidity", "label": "Thermostat Humidity", "dup": false, "domain": "sensor", "room": "Great Room", "role": "status", "device": "Thermostat ", "model": "ecobee3 lite Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"device_class": "humidity", "unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "41"}, {"id": "sensor.great_room_thermostat_temperature", "name": "Thermostat  Temperature", "label": "Thermostat Temperature", "dup": false, "domain": "sensor", "room": "Great Room", "role": "status", "device": "Thermostat ", "model": "ecobee3 lite Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"device_class": "temperature", "unit_of_measurement": "°F"}, "avail": "available", "flag": "", "demo": "69.8"}, {"id": "sensor.living_room_thermostat_humidity", "name": "Thermostat Humidity", "label": "Thermostat Humidity", "dup": false, "domain": "sensor", "room": "Living Room", "role": "status", "device": "Thermostat", "model": "ecobee4 Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"device_class": "humidity", "unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "44"}, {"id": "sensor.living_room_thermostat_temperature", "name": "Thermostat Temperature", "label": "Thermostat Temperature", "dup": false, "domain": "sensor", "room": "Living Room", "role": "status", "device": "Thermostat", "model": "ecobee4 Smart Thermostat", "integration": "ecobee", "features": [], "caps": {"device_class": "temperature", "unit_of_measurement": "°F"}, "avail": "available", "flag": "", "demo": "72.1"}, {"id": "sensor.living_room_vacuum_battery", "name": "Vacuum Battery", "label": "Vacuum Battery", "dup": false, "domain": "sensor", "room": "Living Room", "role": "diagnostic", "device": "Vacuum", "model": "roborock.vacuum.a38", "integration": "roborock", "features": [], "caps": {"device_class": "battery", "unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "100"}, {"id": "sensor.polestar_2", "name": "Polestar 2", "label": "Polestar 2", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_average_energy_consumption", "name": "Polestar 2 Average Energy Consumption", "label": "Polestar 2 Average Energy Consumption", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "energy_distance", "unit_of_measurement": "kWh/100km"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_average_speed", "name": "Polestar 2 Average Speed", "label": "Polestar 2 Average Speed", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "speed", "unit_of_measurement": "mph"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_battery_charge_level", "name": "Polestar Battery", "label": "Polestar Battery", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "battery", "unit_of_measurement": "%"}, "avail": "available", "flag": "", "demo": "78"}, {"id": "sensor.polestar_2_brake_fluid_level_warning", "name": "Polestar 2 Brake Fluid Level Warning", "label": "Polestar 2 Brake Fluid Level Warning", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_charger_connection_status", "name": "Polestar 2 Charger Connection Status", "label": "Polestar 2 Charger Connection Status", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "Connected"}, {"id": "sensor.polestar_2_charging_current", "name": "Polestar 2 Charging Current", "label": "Polestar 2 Charging Current", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "current", "unit_of_measurement": "A"}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_charging_power", "name": "Polestar 2 Charging Power", "label": "Polestar 2 Charging Power", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "power", "unit_of_measurement": "W"}, "avail": "available", "flag": "", "demo": "0"}, {"id": "sensor.polestar_2_charging_status", "name": "Polestar 2 Charging Status", "label": "Polestar 2 Charging Status", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "Idle"}, {"id": "sensor.polestar_2_charging_target_level", "name": "Polestar 2 Charging Target Level", "label": "Polestar 2 Charging Target Level", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"unit_of_measurement": "%"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_charging_target_setting_type", "name": "Polestar 2 Charging Target Setting Type", "label": "Polestar 2 Charging Target Setting Type", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_charging_time", "name": "Polestar 2 Charging Time", "label": "Polestar 2 Charging Time", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"unit_of_measurement": "min"}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_days_to_service", "name": "Polestar 2 Days to service", "label": "Polestar 2 Days To Service", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"unit_of_measurement": "d"}, "avail": "available", "flag": "", "demo": "143"}, {"id": "sensor.polestar_2_distance_to_service", "name": "Polestar 2 Distance to Service", "label": "Polestar 2 Distance To Service", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "distance", "unit_of_measurement": "mi"}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_engine_coolant_level_warning", "name": "Polestar 2 Engine Coolant Level Warning", "label": "Polestar 2 Engine Coolant Level Warning", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_estimate_full_charge_range", "name": "Polestar 2 Estimate Full Charge Range", "label": "Polestar 2 Estimate Full Charge Range", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "distance", "unit_of_measurement": "mi"}, "avail": "available", "flag": "", "demo": "262"}, {"id": "sensor.polestar_2_estimated_charging_time_to_target_distance", "name": "Polestar 2 Estimated Charging Time to Target Distance", "label": "Polestar 2 Estimated Charging Time To Target Distance", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"unit_of_measurement": "min"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_estimated_fully_charged_time", "name": "Polestar 2 Estimated Fully Charged Time", "label": "Polestar 2 Estimated Fully Charged Time", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "timestamp"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_model_name", "name": "Polestar 2 Model Name", "label": "Polestar 2 Model Name", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_model_year", "name": "Polestar 2 Model Year", "label": "Polestar 2 Model Year", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_odometer", "name": "Polestar 2 Odometer", "label": "Polestar 2 Odometer", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "distance", "unit_of_measurement": "km"}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_oil_level_warning", "name": "Polestar 2 Oil Level Warning", "label": "Polestar 2 Oil Level Warning", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_range", "name": "Polestar 2 Range", "label": "Polestar 2 Range", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "distance", "unit_of_measurement": "mi"}, "avail": "available", "flag": "", "demo": "204"}, {"id": "sensor.polestar_2_service_warning", "name": "Polestar 2 Service Warning", "label": "Polestar 2 Service Warning", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "—"}, {"id": "sensor.polestar_2_trip_meter_automatic", "name": "Polestar 2 Trip Meter Automatic", "label": "Polestar 2 Trip Meter Automatic", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "distance", "unit_of_measurement": "mi"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_trip_meter_manual", "name": "Polestar 2 Trip Meter Manual", "label": "Polestar 2 Trip Meter Manual", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "distance", "unit_of_measurement": "mi"}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sensor.polestar_2_voltage", "name": "Polestar 2 Voltage", "label": "Polestar 2 Voltage", "dup": false, "domain": "sensor", "room": "Garage", "role": "status", "device": "Polestar 2", "model": "Polestar 2", "integration": "polestar_api", "features": [], "caps": {"device_class": "voltage", "unit_of_measurement": "V"}, "avail": "available", "flag": "", "demo": "—"}, {"id": "siren.basement_basement_cam_siren", "name": "Basement Cam Siren", "label": "Basement Cam Siren", "dup": false, "domain": "siren", "room": "Basement", "role": "control", "device": "Basement Cam", "model": "E1 Pro", "integration": "reolink", "features": ["turn_on", "turn_off", "volume_set", "duration"], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "siren.great_room_great_room_cam_siren", "name": "Great Room Cam Siren", "label": "Great Room Cam Siren", "dup": false, "domain": "siren", "room": "Great Room", "role": "control", "device": "Great Room Cam", "model": "E1 Pro", "integration": "reolink", "features": ["turn_on", "turn_off", "volume_set", "duration"], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "siren.living_room_living_room_cam_siren", "name": "Living Room Cam Siren", "label": "Living Room Cam Siren", "dup": false, "domain": "siren", "room": "Living Room", "role": "control", "device": "Living Room Cam", "model": "E1 Zoom", "integration": "reolink", "features": ["turn_on", "turn_off", "volume_set", "duration"], "caps": {}, "avail": "unknown", "flag": "", "demo": "unknown"}, {"id": "sun.sun", "name": "Sun", "label": "Sun", "dup": false, "domain": "sun", "room": "Unassigned", "role": "status", "device": "", "model": "", "integration": "", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "available"}, {"id": "switch.great_room_great_room_main_lights_zone_2", "name": "Great Room Main Lights Zone 2", "label": "Great Room Main Lights Zone 2", "dup": false, "domain": "switch", "room": "Great Room", "role": "control", "device": "Great Room Main Lights Zone 2", "model": "DVRF-5NS (DivaSmartSwitch)", "integration": "lutron_caseta", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "off"}, {"id": "switch.great_room_smart_bridge_unassigned_smart_away", "name": "Smart Bridge Unassigned Smart Away", "label": "Smart Bridge Unassigned Smart Away", "dup": false, "domain": "switch", "room": "Great Room", "role": "control", "device": "Smart Bridge", "model": "L-BDG2-WH (SmartBridge)", "integration": "lutron_caseta", "features": [], "caps": {}, "avail": "available", "flag": "Purpose unclear (Lutron bridge setting)", "demo": "off"}, {"id": "switch.night_light_socket", "name": "night light Socket", "label": "Night Light Socket", "dup": false, "domain": "switch", "room": "Unassigned", "role": "control", "device": "night light", "model": "Smart Plug", "integration": "tuya", "features": [], "caps": {"device_class": "outlet"}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "switch.recliners_socket", "name": "Recliners Socket", "label": "Recliners Socket", "dup": false, "domain": "switch", "room": "Unassigned", "role": "control", "device": "Recliners", "model": "Smart Plug", "integration": "tuya", "features": [], "caps": {"device_class": "outlet"}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "switch.record_player_socket", "name": "Record Player Socket", "label": "Record Player Socket", "dup": false, "domain": "switch", "room": "Unassigned", "role": "control", "device": "Record Player", "model": "Smart Plug", "integration": "tuya", "features": [], "caps": {"device_class": "outlet"}, "avail": "unavailable", "flag": "", "demo": "unavailable"}, {"id": "switch.roborock_q7_max_dock_dust_emptying", "name": "Roborock Q7 Max Dock Dust emptying", "label": "Roborock Q7 Max Dock Dust Emptying", "dup": false, "domain": "switch", "room": "Living Room", "role": "control", "device": "Roborock Q7 Max Dock", "model": "roborock.vacuum.a38 Dock", "integration": "roborock", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "off"}, {"id": "switch.wemo_mini", "name": "Wemo Mini", "label": "Wemo Mini", "dup": false, "domain": "switch", "room": "Unassigned", "role": "control", "device": "Wemo Mini", "model": "Socket", "integration": "wemo", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "off"}, {"id": "vacuum.living_room_vacuum", "name": "Vacuum", "label": "Vacuum", "dup": false, "domain": "vacuum", "room": "Living Room", "role": "control", "device": "Vacuum", "model": "roborock.vacuum.a38", "integration": "roborock", "features": ["pause", "stop", "return_home", "fan_speed", "send_command", "locate", "clean_spot", "state", "start"], "caps": {"fan_speed_list": ["quiet", "balanced", "turbo", "max", "gentle"]}, "avail": "available", "flag": "", "demo": "docked"}, {"id": "weather.forecast_home", "name": "Forecast Home", "label": "Forecast Home", "dup": false, "domain": "weather", "room": "Unassigned", "role": "status", "device": "Forecast", "model": "Forecast", "integration": "met", "features": [], "caps": {}, "avail": "available", "flag": "", "demo": "available"}]};
+const E = DATA.entities;
+const byId = Object.fromEntries(E.map(e => [e.id, e]));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// Local demo state only. Nothing leaves this page.
+const S = {};
+E.forEach(e => {
+  S[e.id] = { state: e.demo, bri: 70, vol: 30 };
+  if (e.domain === "climate") S[e.id].set = e.demo === "cool" ? 74 : 68;
+  if (e.domain === "climate") S[e.id].preset = "home";
+  if (e.domain === "vacuum") S[e.id].fan = "balanced";
+  if (e.domain === "lock") S[e.id].changed = Date.now() - 12 * 60000;
+});
+// The lock starts from its inventory state; if that is unknown it stays unknown (see lockCard).
+let view = "home", room = "Kitchen", confirmFor = null, confirmAct = null, showNA = false;
+const inv = { q: "", room: "", domain: "", av: "", flagged: false };
+try { const v = localStorage.getItem("hp-view"); if (v) view = v; } catch (_) {}
+const h = (location.hash || "").slice(1);
+if (["home","rooms","cameras","inventory"].includes(h)) view = h;
+
+const ICON = {
+  light:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/>',
+  switch:'<rect x="7" y="3" width="10" height="18" rx="3"/><path d="M12 7v4"/>',
+  media_player:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/>',
+  sensor:'<path d="M12 3v12M8.5 17.5a3.5 3.5 0 1 0 7 0 3.5 3.5 0 0 0-7 0"/>',
+  binary_sensor:'<circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0 1 14 0M2 12a10 10 0 0 1 20 0"/>',
+  button:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+  siren:'<path d="M6 18V12a6 6 0 0 1 12 0v6M4 18h16M12 3v2"/>',
+  remote:'<rect x="8" y="2.5" width="8" height="19" rx="3"/><circle cx="12" cy="7" r="1"/>',
+  vacuum:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  climate:'<path d="M12 3v12M8.5 17.5a3.5 3.5 0 1 0 7 0 3.5 3.5 0 0 0-7 0"/>',
+  door:'<path d="M5 21h14M7 21V4h10v17"/><circle cx="14" cy="12.5" r=".8"/>',
+  battery:'<rect x="7" y="4" width="10" height="17" rx="2"/><path d="M10 2.5h4M9.5 15h5M9.5 11h5M9.5 7.5h5"/>',
+  default:'<circle cx="12" cy="12" r="8"/>'
+};
+const icon = d => `<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICON[d] || ICON.default}</svg></span>`;
+const na = e => e.avail !== "available" && !(["button","siren","lock"].includes(e.domain) && e.avail === "unknown");
+const unit = e => { const u = e.caps.unit_of_measurement; return !u ? "" : u === "%" || u.startsWith("°") ? u : ` ${u}`; };
+const visible = e => !e.dup;
+const flagBadge = e => e.flag ? `<span class="badge" title="${esc(e.flag)}">Check name</span>` : (e.room === "Unassigned" ? `<span class="badge un">No area</span>` : "");
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.innerHTML = msg; t.hidden = false;
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600);
+}
+const demo = (svc, id) => toast(`Prototype: would call <code>${esc(svc)}</code> on <code>${esc(id)}</code>. Nothing was sent.`);
+
+function valueText(e) {
+  const s = S[e.id].state;
+  if (na(e)) return e.avail === "unknown" ? "State unknown" : "Unavailable";
+  if (e.domain === "binary_sensor") {
+    const dc = e.caps.device_class;
+    if (dc === "occupancy") return s === "on" ? "Occupied" : "Clear";
+    if (dc === "door") return s === "on" ? "Open" : "Closed";
+    return s === "on" ? "Detected" : "Clear";
+  }
+  if (e.domain === "sensor") return s === "—" ? "—" : s + unit(e);
+  if (s === "available") return e.role === "control" ? "Setting, not simulated" : "Not simulated";
+  return s;
+}
+
+/* ---------- tiles ---------- */
+function tile(e) {
+  const d = e.domain, st = S[e.id], dead = na(e);
+  if (d === "light" || d === "switch") {
+    const on = st.state === "on", dim = (e.caps.supported_color_modes || []).some(m => m !== "onoff");
+    return `<div class="tile ${on ? "on" : ""} ${dead ? "na" : ""}">
+      ${flagBadge(e)}
+      <button class="tile-hit" data-act="toggle" data-id="${e.id}" ${dead ? "disabled" : ""} aria-pressed="${on}" style="all:unset;display:grid;gap:6px;cursor:${dead ? "not-allowed" : "pointer"}">
+        ${icon(d)}<span class="nm">${esc(e.label)}</span>
+        <span class="st">${dead ? valueText(e) : on ? (dim ? `On · ${st.bri}%` : "On") : "Off"}</span>
+      </button>
+      ${on && dim && !dead ? `<input type="range" min="1" max="100" value="${st.bri}" data-act="bri" data-id="${e.id}" id="bri-${e.id}" aria-label="Brightness ${esc(e.label)}">` : ""}
+    </div>`;
+  }
+  if (d === "siren" && confirmFor === e.id) {
+    return `<div class="tile">${icon(d)}<span class="nm">${esc(e.label)}</span><div class="confirm" style="padding:6px">Sound it?<button class="btn danger" data-act="siren-go" data-id="${e.id}">Sound</button><button class="btn" data-act="cancel">Cancel</button></div></div>`;
+  }
+  if (d === "button" || d === "siren" || d === "remote") {
+    const act = d === "siren" ? "siren" : d === "remote" ? "remote" : "press";
+    return `<button class="tile ${dead ? "na" : ""}" data-act="${act}" data-id="${e.id}" ${dead ? "disabled" : ""}>${flagBadge(e)}${icon(d)}<span class="nm">${esc(e.label)}</span><span class="st">${d === "siren" ? "Tap to sound" : d === "remote" ? "Power" : "Press"}</span></button>`;
+  }
+  if (d === "media_player") return mediaCard(e);
+  if (d === "climate") return thermoCard(e);
+  if (d === "lock") return lockCard(e, "room");
+  if (d === "vacuum") return vacuumCard(e);
+  if (d === "camera") return camCard(e);
+  return `<div class="tile ${dead ? "na" : ""}">${flagBadge(e)}${icon(d)}<span class="nm">${esc(e.label)}</span><span class="st">${esc(valueText(e))}</span></div>`;
+}
+
+function thermoCard(e) {
+  const st = S[e.id], base = e.id.replace("climate.", "sensor.");
+  const t = byId[base + "_temperature"], hu = byId[base + "_humidity"];
+  const modes = e.caps.hvac_modes || [];
+  return `<div class="card thermo">
+    <div class="row"><div><div class="meta">${esc(e.room)}</div><div class="big">${t ? esc(S[t.id].state) : "—"}<small>°F</small></div><div class="meta">Humidity ${hu ? esc(S[hu.id].state) + "%" : "—"} · ${esc(st.state === "off" ? "System off" : st.state === "heat" ? "Heating to" : "Cooling to")} ${st.state === "off" ? "" : st.set + "°"}</div></div>
+      <div class="setp"><button class="round" data-act="set" data-d="-1" data-id="${e.id}" aria-label="Lower setpoint">−</button><span class="v">${st.set}°</span><button class="round" data-act="set" data-d="1" data-id="${e.id}" aria-label="Raise setpoint">+</button></div></div>
+    <div class="row"><div class="seg" role="group" aria-label="Mode">${modes.map(m => `<button data-act="hvac" data-v="${m}" data-id="${e.id}" aria-pressed="${st.state === m}">${m}</button>`).join("")}</div>
+      <select id="preset-${e.id}" data-act="preset" data-id="${e.id}" aria-label="Preset">${(e.caps.preset_modes || []).map(p => `<option ${p === st.preset ? "selected" : ""}>${p.replace(/_/g, " ")}</option>`).join("")}</select></div>
+    <code class="meta" style="font-family:var(--mono);font-size:11.5px">${e.id}</code>
+  </div>`;
+}
+
+// Mirrors the live dashboard (pulled 2026-09-26): one lock tile. Tapping the icon asks
+// for confirmation, then toggles (unlock only if currently locked, otherwise lock).
+// Tapping the tile opens details. The warning shows only while the state is unknown or
+// unavailable, and a command never turns an unknown state into a displayed one.
+const lockKnown = st => st.state === "locked" || st.state === "unlocked";
+function lockStateText(st) {
+  if (!lockKnown(st)) return st.state === "unavailable" ? "Unavailable" : "Unknown";
+  const mins = Math.max(0, Math.round((Date.now() - st.changed) / 60000));
+  return `${st.state === "locked" ? "Locked" : "Unlocked"} · ${mins < 1 ? "just now" : mins < 60 ? `${mins} min ago` : `${Math.round(mins / 60)} h ago`}`;
+}
+function lockCard(e, mode = "home") {
+  const st = S[e.id], known = lockKnown(st), ask = confirmFor === e.id;
+  const tone = !known ? "warn" : st.state === "locked" ? "ok" : "bad";
+  const iconBtn = mode === "home"
+    ? `<button class="lock-ic ${tone}" data-act="lock-icon" data-id="${e.id}" aria-label="Lock or unlock the front door">${icon("lock")}</button>`
+    : `<span class="lock-ic ${tone}" aria-hidden="true">${icon("lock")}</span>`;
+  return `<div class="card locktile">
+    <div class="lockrow">${iconBtn}
+      <button class="lock-body" data-act="lock-details" data-id="${e.id}"><span class="nm">${esc(e.label)}</span><span class="st lock-state">${esc(lockStateText(st))}</span></button></div>
+    ${ask ? `<div class="confirm" role="alertdialog" aria-label="Front door lock"><div><b>Front door lock</b><br>If the door is locked, this unlocks it. If it is unlocked or its state is unknown, this locks it.</div><button class="btn primary" data-act="lock-go" data-id="${e.id}">Continue</button><button class="btn" data-act="cancel">Cancel</button></div>` : ""}
+    ${known ? "" : `<div class="warnbox"><b>Lock state is not confirmed.</b> Home Assistant reports this lock as <i>${esc(lockStateText(st).toLowerCase())}</i>, so this dashboard can't show whether the door is locked. The door sensor is <i>${esc(valueText(byId["binary_sensor.front_door_door"]).toLowerCase())}</i>.${st.last ? ` <span class="lock-last">Last demo command: <b>${st.last}</b>, not confirmed by the lock.</span>` : ""}</div>`}
+  </div>`;
+}
+function securityBadges() {
+  const door = byId["binary_sensor.front_door_door"], bat = byId["sensor.front_door_battery"];
+  return `<span class="hbadges">${door ? `<button class="hbadge" data-act="details" data-id="${door.id}">${icon("door")}${esc(valueText(door))}</button>` : ""}${bat ? `<button class="hbadge" data-act="details" data-id="${bat.id}">${icon("battery")}${esc(valueText(bat))}</button>` : ""}</span>`;
+}
+
+function vacuumCard(e) {
+  const st = S[e.id], bat = byId["sensor.living_room_vacuum_battery"];
+  return `<div class="card thermo">
+    <div class="row"><div><div class="meta">${esc(e.room)} · Roborock Q7 Max</div><div class="big" style="font-size:30px;text-transform:capitalize">${esc(st.state)}</div><div class="meta">Battery ${bat ? esc(valueText(bat)) : "—"}</div></div>${icon("vacuum")}</div>
+    <div class="btns"><button class="btn primary" data-act="vac" data-v="cleaning" data-id="${e.id}">Start</button><button class="btn" data-act="vac" data-v="paused" data-id="${e.id}">Pause</button><button class="btn" data-act="vac" data-v="returning" data-id="${e.id}">Dock</button>
+    <select id="fan-${e.id}" data-act="fan" data-id="${e.id}" aria-label="Suction">${(e.caps.fan_speed_list || []).map(f => `<option ${f === st.fan ? "selected" : ""}>${f}</option>`).join("")}</select></div>
+  </div>`;
+}
+
+function mediaCard(e) {
+  const st = S[e.id], dead = na(e), playing = st.state === "playing";
+  const vol = e.features.includes("volume_set");
+  return `<div class="card thermo" style="position:relative;${dead ? "opacity:.55" : ""}">
+    ${flagBadge(e)}
+    <div class="row" style="padding-right:${e.flag || e.room === "Unassigned" ? "80px" : "0"}"><div style="min-width:0"><div class="nm" style="font-weight:600">${esc(e.label)}</div><div class="meta">${esc(e.model || e.integration)} · <span style="text-transform:capitalize">${esc(dead ? e.avail : st.state)}</span></div></div></div>
+    <div class="btns" style="align-items:center">
+      <button class="btn ${playing ? "" : "primary"}" data-act="play" data-id="${e.id}" ${dead ? "disabled" : ""}>${playing ? "Pause" : "Play"}</button>
+      ${vol ? `<input type="range" min="0" max="100" value="${st.vol}" data-act="vol" data-id="${e.id}" id="vol-${e.id}" aria-label="Volume ${esc(e.label)}" style="flex:1;min-width:100px;accent-color:var(--teal)">` : `<span class="meta">Volume up/down only</span>`}
+    </div>
+    ${e.caps.source_list ? `<select id="src-${e.id}" data-act="src" data-id="${e.id}" aria-label="Input">${e.caps.source_list.map(s => `<option>${esc(s)}</option>`).join("")}</select>` : ""}
+  </div>`;
+}
+
+function camCard(e, tag = "button") {
+  const off = na(e);
+  const status = off ? "Offline" : "Online";
+  return `<${tag} class="cam ${off ? "off" : ""}" ${tag === "button" ? `data-act="cam" data-id="${e.id}"` : ""} aria-label="${esc(e.label)}, ${status.toLowerCase()}${e.flag ? ", name needs checking" : ""}">
+    <span class="cstat">● ${status}</span>
+    ${e.flag ? `<span class="badge" title="${esc(e.flag)}">Check name</span>` : e.room === "Unassigned" ? `<span class="badge un">No area</span>` : ""}
+    <div class="feed">${off ? "No signal" : "Preview not loaded"}</div>
+    <div class="cap"><b>${esc(e.label)}</b><span>${esc(e.room === "Unassigned" ? "No area" : e.room)}</span></div>
+  </${tag}>`;
+}
+
+/* ---------- views ---------- */
+const lightsFor = () => E.filter(e => (e.domain === "light" || e.domain === "switch") && e.role === "control" && !/status_led|indicator|smart_away|dust_emptying/.test(e.id));
+const cams = () => E.filter(e => e.domain === "camera").sort((a, b) => na(a) - na(b) || a.room.localeCompare(b.room));
+function group(list) { const g = {}; list.forEach(e => (g[e.room] ||= []).push(e)); return Object.entries(g).sort((a, b) => (a[0] === "Unassigned") - (b[0] === "Unassigned") || a[0].localeCompare(b[0])); }
+
+function viewHome() {
+  const now = new Date();
+  const offCams = cams().filter(na).length, flagged = E.filter(e => e.flag && e.domain === "camera").length;
+  const deadLights = lightsFor().filter(na).length, unassigned = E.filter(e => e.room === "Unassigned" && e.role === "control").length;
+  const lights = lightsFor(), onCount = lights.filter(e => S[e.id].state === "on").length;
+  const car = id => S["sensor.polestar_2_" + id]?.state ?? "—";
+  const ink = ["black","cyan","magenta","yellow"].map(c => [c, +S[`sensor.epson_et_2850_series_${c}_ink`].state]);
+  const shownLights = showNA ? lights : lights.filter(e => !na(e));
+  const players = E.filter(e => e.domain === "media_player" && visible(e))
+    .sort((a, b) => (S[b.id].state === "playing") - (S[a.id].state === "playing") || a.label.localeCompare(b.label));
+  return `
+  <div class="top">
+    <div><div class="clock">${now.toLocaleTimeString([], {hour: "numeric", minute: "2-digit"})}</div><div class="date">${now.toLocaleDateString([], {weekday: "long", month: "long", day: "numeric"})}</div></div>
+    <span class="proto"><b>Prototype</b> Demo data</span>
+  </div>
+  <div class="attention" aria-label="Needs attention">
+    <button class="pill ${lockKnown(S["lock.front_door"]) ? "info" : "warn"}" data-act="lock-details" data-id="lock.front_door"><span class="dot"></span>Lock: ${lockStateText(S["lock.front_door"]).split(" · ")[0]}</button>
+    <button class="pill bad" data-go="cameras"><span class="dot"></span>${offCams} of ${cams().length} cameras offline</button>
+    <button class="pill warn" data-go="cameras"><span class="dot"></span>${flagged} camera names to check</button>
+    <button class="pill bad" data-act="show-na"><span class="dot"></span>${deadLights} lights/plugs unavailable</button>
+    <button class="pill info" data-go="inventory" data-flag="1"><span class="dot"></span>${unassigned} controls with no area</button>
+  </div>
+  <div class="sections">
+    <section class="sec half"><h2>Security ${securityBadges()}</h2>${lockCard(byId["lock.front_door"])}</section>
+    <section class="sec half"><h2>Cleaning</h2>${vacuumCard(byId["vacuum.living_room_vacuum"])}</section>
+    <section class="sec"><h2>Cameras <span class="count">${cams().length - offCams} of ${cams().length} online</span></h2>
+      <div class="strip" id="camstrip" aria-label="Online cameras, swipe for more">${cams().filter(e => !na(e)).map(e => camCard(e)).join("")}</div>
+      <div class="strip-count"><span id="stripcount">Swipe for more</span> · <button class="btn" style="padding:3px 10px;font-size:12px" data-go="cameras">All ${cams().length} cameras</button></div></section>
+    <section class="sec"><h2>Climate</h2><div class="pair">${E.filter(e => e.domain === "climate").map(thermoCard).join("")}</div>
+      <div class="card slim"><span class="meta">Bedroom · ecobee sensor</span><span class="v">${esc(S["sensor.bedroom_sensor_temperature"].state)}°F</span><span class="meta">${valueText(byId["binary_sensor.bedroom_sensor_occupancy"])} · Living room ${valueText(byId["binary_sensor.living_room_thermostat_occupancy"]).toLowerCase()}</span></div></section>
+    <section class="sec"><h2>Lights and plugs <span class="count">${onCount} on</span></h2>
+      ${group(shownLights).map(([r, l]) => `<div class="room-label">${esc(r)}</div><div class="grid">${l.map(tile).join("")}</div>`).join("")}
+      <div class="btns showmore"><button class="btn" data-act="show-na">${showNA ? "Hide unavailable" : `Show ${deadLights} unavailable`}</button><button class="btn" data-act="all-off">Turn all lights off</button></div></section>
+    <section class="sec"><h2>Media <span class="count">${players.filter(e => S[e.id].state === "playing").length} playing</span></h2><div class="pair">${players.map(mediaRow).join("")}</div></section>
+    <section class="sec half"><h2>Garage · Polestar 2</h2><div class="card thermo">
+      <div class="car"><div class="big">${car("battery_charge_level")}<small>%</small></div><div><div class="bar"><i style="width:${car("battery_charge_level")}%"></i></div></div>
+      <div class="meta">Range ${car("range")} mi</div><div class="meta">${car("charger_connection_status")} · ${car("charging_status")} · service in ${car("days_to_service")} days</div></div></div></section>
+    <section class="sec half"><h2>Office · Epson ET-2850</h2><div class="card thermo">
+      ${ink.map(([c, v]) => `<div class="ink"><span style="text-transform:capitalize">${c}</span><div class="bar ${v < 20 ? "low" : ""}"><i style="width:${v}%"></i></div><span>${v}%</span></div>`).join("")}
+      <div class="meta">Yellow is low in this demo.</div></div></section>
+  </div>
+  <p class="foot">Prototype with demo values. It is not connected to Home Assistant; each control shows the service it would call. Labels are tidied for display only (for example “Fluent” is dropped from camera names); the Inventory view lists the names as Home Assistant has them.</p>`;
+}
+
+function mediaRow(e) {
+  const st = S[e.id], dead = na(e), playing = st.state === "playing";
+  const extra = e.id === "media_player.great_room_sony_tv" ? " · 4 entities grouped" : "";
+  return `<div class="card mrow" style="${dead ? "opacity:.55" : ""}">
+    <div style="min-width:0"><span class="nm">${esc(e.label)}</span>${e.flag ? `<span class="badge" title="${esc(e.flag)}">Check</span>` : e.room === "Unassigned" ? `<span class="badge un">No area</span>` : ""}
+      <div class="meta">${esc(e.room === "Unassigned" ? e.model || e.integration : e.room)} · <span style="text-transform:capitalize">${esc(dead ? e.avail : st.state)}</span>${extra}</div></div>
+    <button class="btn ${playing ? "" : "primary"}" data-act="play" data-id="${e.id}" ${dead ? "disabled" : ""}>${playing ? "Pause" : "Play"}</button>
+    ${playing && e.features.includes("volume_set") ? `<input type="range" min="0" max="100" value="${st.vol}" data-act="vol" data-id="${e.id}" id="hvol-${e.id}" aria-label="Volume ${esc(e.label)}">` : ""}
+  </div>`;
+}
+
+function viewRooms() {
+  const rooms = [...DATA.meta.areas, "Unassigned"];
+  const counts = Object.fromEntries(rooms.map(r => [r, E.filter(e => e.room === r && visible(e)).length]));
+  const list = E.filter(e => e.room === room && visible(e));
+  const order = ["climate","lock","light","switch","media_player","remote","vacuum","camera","siren","button","binary_sensor","sensor","weather","sun"];
+  list.sort((a, b) => order.indexOf(a.domain) - order.indexOf(b.domain) || a.name.localeCompare(b.name));
+  const big = list.filter(e => ["climate","lock","media_player","vacuum","camera"].includes(e.domain));
+  const small = list.filter(e => !big.includes(e));
+  return `<div class="top"><h1 class="view-title">Rooms</h1><span class="proto"><b>Prototype</b> Demo values</span></div>
+  <div class="chips" role="group" aria-label="Rooms">${rooms.map(r => `<button class="chip" data-room="${esc(r)}" aria-pressed="${r === room}">${esc(r)}<span class="n">${counts[r]}</span></button>`).join("")}</div>
+  ${room === "Unassigned" ? `<p class="note">These entities have no area in Home Assistant. They are shown as found; assign areas in Home Assistant when you are ready.</p>` : ""}
+  ${list.length ? "" : `<p class="note">No enabled dashboard entities in this area.</p>`}
+  ${big.length ? `<div class="${big.every(e => e.domain === "camera") ? "cams" : "grid wide"}" style="margin-bottom:12px">${big.map(tile).join("")}</div>` : ""}
+  ${small.length ? `<div class="grid">${small.map(tile).join("")}</div>` : ""}`;
+}
+
+function viewCameras() {
+  const c = cams();
+  return `<div class="top"><h1 class="view-title">Cameras</h1><span class="proto"><b>Prototype</b> No images or streams are loaded</span></div>
+  <p class="note">${c.length} camera entities are in use. Another ${DATA.meta.disabled_cameras} stream variants (clear, balanced, snapshots) are disabled and not shown. Each card shows <b>Online</b> or <b>Offline</b> from the inventory snapshot. Cards marked “Check name” have names that disagree with their entity ID or area; the names come from Home Assistant with only the “Fluent” stream label dropped. Tap a camera for details, then swipe or use Prev/Next to move between cameras.</p>
+  <div class="cams">${c.map(e => camCard(e)).join("")}</div>`;
+}
+
+function viewInventory() {
+  const rooms = [...new Set(E.map(e => e.room))].sort(), doms = [...new Set(E.map(e => e.domain))].sort();
+  const q = inv.q.toLowerCase();
+  const rows = E.filter(e => (!q || (e.name + " " + e.label + " " + e.id).toLowerCase().includes(q)) && (!inv.room || e.room === inv.room) && (!inv.domain || e.domain === inv.domain) && (!inv.av || e.avail === inv.av) && (!inv.flagged || e.flag || e.room === "Unassigned"))
+    .sort((a, b) => a.room.localeCompare(b.room) || a.domain.localeCompare(b.domain) || a.id.localeCompare(b.id));
+  const caps = e => [e.caps.device_class, e.caps.unit_of_measurement, ...(e.features || []), e.caps.supported_color_modes && "modes: " + e.caps.supported_color_modes.join("/"), e.caps.hvac_modes && "hvac: " + e.caps.hvac_modes.join("/")].filter(Boolean).join(", ");
+  const m = DATA.meta;
+  return `<div class="top"><h1 class="view-title">Inventory</h1><span class="proto">Snapshot ${esc(m.generated.slice(0, 10))} · HA ${esc(m.ha_version)}</span></div>
+  <p class="note">${E.length} dashboard-relevant entities from ${m.counts.registry_entities} registered. Disabled, diagnostic and config entities are left out, as are ${m.sensitive_hidden} sensitive ones (people, phone trackers, location, network and vehicle identifiers). The full list is in <code>inventory/ha_inventory.csv</code> on your PC.</p>
+  <div class="filters">
+    <input type="search" id="inv-q" placeholder="Search name or entity ID" value="${esc(inv.q)}" aria-label="Search">
+    <select id="inv-room" aria-label="Room"><option value="">All rooms</option>${rooms.map(r => `<option ${r === inv.room ? "selected" : ""}>${esc(r)}</option>`).join("")}</select>
+    <select id="inv-domain" aria-label="Domain"><option value="">All domains</option>${doms.map(d => `<option ${d === inv.domain ? "selected" : ""}>${d}</option>`).join("")}</select>
+    <select id="inv-av" aria-label="Availability"><option value="">Any status</option>${["available","unavailable","unknown"].map(a => `<option ${a === inv.av ? "selected" : ""}>${a}</option>`).join("")}</select>
+    <label><input type="checkbox" id="inv-flag" ${inv.flagged ? "checked" : ""}> Needs review only</label>
+    <span class="meta">${rows.length} shown</span>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Room</th><th>Name in Home Assistant</th><th>Prototype label</th><th>Entity ID</th><th>Domain</th><th>Capabilities</th><th>Availability</th><th>Review</th></tr></thead><tbody>
+  ${rows.map(e => `<tr><td>${e.room === "Unassigned" ? `<span class="flag">No area</span>` : esc(e.room)}</td><td>${esc(e.name)}</td><td>${e.label === e.name ? `<span class="meta">same</span>` : esc(e.label)}</td><td><code>${e.id}</code></td><td>${e.domain}</td><td>${esc(caps(e))}</td><td><span class="av ${e.avail}"><span class="dot"></span>${e.avail}</span></td><td class="flag">${esc(e.dup ? "Grouped under media_player.great_room_sony_tv on Home and Rooms. " + e.flag : e.flag)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+function camDrawer(id) {
+  const e = byId[id], rel = E.filter(x => x.device && x.device === e.device && x.id !== id);
+  const btn = s => rel.find(x => x.id.endsWith("_ptz_" + s));
+  const siren = rel.find(x => x.domain === "siren"), sensors = rel.filter(x => x.domain === "binary_sensor");
+  const lights = rel.filter(x => x.domain === "light");
+  const ptz = ["up","left","stop","right","down"].every(btn);
+  const all = cams(), i = all.findIndex(x => x.id === id);
+  document.getElementById("overlay").innerHTML = `<div class="drawer-bg" data-act="close"></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-label="${esc(e.label)}">
+    <header><div><h3>${esc(e.label)}</h3><code>${e.id}</code><div class="meta">${esc(e.room)} · ${esc(e.model || e.integration)} · ${na(e) ? "offline" : "online"}</div></div><button class="btn" data-act="close">Close</button></header>
+    <div class="camnav"><button class="btn" data-act="cam-step" data-d="-1" aria-label="Previous camera">‹ Prev</button><span id="camidx">${i + 1} of ${all.length}</span><button class="btn" data-act="cam-step" data-d="1" aria-label="Next camera">Next ›</button><span class="meta" style="min-width:0;text-align:left">or swipe the preview</span></div>
+    ${e.flag ? `<div class="warnbox"><b>Check name.</b> ${esc(e.flag)}</div>` : ""}
+    <div id="swipezone">${camCard(e, "div")}</div>
+    ${lights.length ? `<div><h2>Lights</h2><div class="grid">${lights.map(tile).join("")}</div></div>` : ""}
+    ${sensors.length ? `<div><h2>Detection</h2><div class="grid">${sensors.map(tile).join("")}</div></div>` : ""}
+    ${ptz ? `<div><h2>Pan and tilt</h2><div class="ptz"><span></span><button data-act="press" data-id="${btn("up").id}" aria-label="Up">▲</button><span></span><button data-act="press" data-id="${btn("left").id}" aria-label="Left">◀</button><button data-act="press" data-id="${btn("stop").id}" aria-label="Stop">■</button><button data-act="press" data-id="${btn("right").id}" aria-label="Right">▶</button><span></span><button data-act="press" data-id="${btn("down").id}" aria-label="Down">▼</button></div></div>` : ""}
+    ${siren ? `<div><h2>Siren</h2>${confirmFor === siren.id ? `<div class="confirm">Sound the ${esc(e.label)} siren?<button class="btn danger" data-act="siren-go" data-id="${siren.id}">Sound siren</button><button class="btn" data-act="cancel">Cancel</button></div>` : `<button class="btn" data-act="siren" data-id="${siren.id}">Sound siren…</button>`}</div>` : ""}
+  </aside>`;
+  camDrawer.open = id;
+}
+
+/* ---------- render + events ---------- */
+function render() {
+  const m = document.getElementById("main");
+  const chipScroll = document.querySelector(".chips")?.scrollLeft || 0;
+  m.innerHTML = view === "home" ? viewHome() : view === "rooms" ? viewRooms() : view === "cameras" ? viewCameras() : viewInventory();
+  document.querySelectorAll(".nav-btn").forEach(b => b.setAttribute("aria-current", b.dataset.view === view ? "page" : "false"));
+  // Keep the room chip row where the viewer left it, and the selected chip in view.
+  const chips = document.querySelector(".chips");
+  if (chips) {
+    chips.scrollLeft = chipScroll;
+    const sel = chips.querySelector('[aria-pressed="true"]');
+    if (sel) {
+      const cr = chips.getBoundingClientRect(), sr = sel.getBoundingClientRect();
+      if (sr.left < cr.left) chips.scrollLeft -= cr.left - sr.left + 8;
+      else if (sr.right > cr.right) chips.scrollLeft += sr.right - cr.right + 8;
+    }
+  }
+  const strip = document.getElementById("camstrip");
+  if (strip) {
+    const upd = () => {
+      const kids = [...strip.children], w = kids[0]?.getBoundingClientRect().width || 1;
+      const first = Math.round(strip.scrollLeft / (w + 10)), shown = Math.max(1, Math.floor((strip.clientWidth + 10) / (w + 10)));
+      const c = document.getElementById("stripcount");
+      if (c) c.textContent = kids.length <= shown ? `${kids.length} online` : `${first + 1}–${Math.min(kids.length, first + shown)} of ${kids.length} · swipe for more`;
+    };
+    strip.addEventListener("scroll", upd, { passive: true }); upd();
+  }
+  if (camDrawer.open) camDrawer(camDrawer.open);
+}
+function stepCam(d) {
+  const all = cams(), i = all.findIndex(x => x.id === camDrawer.open);
+  confirmFor = null;
+  camDrawer(all[(i + d + all.length) % all.length].id);
+}
+let touchX = null;
+document.addEventListener("touchstart", ev => { touchX = ev.target.closest("#swipezone") ? ev.touches[0].clientX : null; }, { passive: true });
+document.addEventListener("touchend", ev => {
+  if (touchX === null || !camDrawer.open) return;
+  const dx = ev.changedTouches[0].clientX - touchX; touchX = null;
+  if (Math.abs(dx) > 40) stepCam(dx < 0 ? 1 : -1);
+});
+window.addEventListener("hashchange", () => {
+  const v = location.hash.slice(1);
+  if (["home","rooms","cameras","inventory"].includes(v) && v !== view) go(v);
+});
+function go(v) { view = v; confirmFor = null; try { localStorage.setItem("hp-view", v); } catch (_) {} render(); window.scrollTo(0, 0); }
+
+document.addEventListener("click", ev => {
+  const nav = ev.target.closest("[data-view]"); if (nav) return go(nav.dataset.view);
+  const g = ev.target.closest("[data-go]"); if (g) { if (g.dataset.flag) inv.flagged = true; return go(g.dataset.go); }
+  const r = ev.target.closest("[data-room]"); if (r) { room = r.dataset.room; return render(); }
+  const t = ev.target.closest("[data-act]"); if (!t || t.tagName === "SELECT" || t.type === "range") return;
+  const id = t.dataset.id, st = S[id], e = byId[id];
+  switch (t.dataset.act) {
+    case "toggle": st.state = st.state === "on" ? "off" : "on"; demo(`${e.domain}.turn_${st.state}`, id); break;
+    case "set": st.set = Math.min(Math.floor(e.caps.max_temp || 95), Math.max(Math.ceil(e.caps.min_temp || 45), st.set + +t.dataset.d)); demo("climate.set_temperature", id); break;
+    case "hvac": st.state = t.dataset.v; demo("climate.set_hvac_mode", id); break;
+    case "lock-icon": confirmFor = id; break;
+    case "lock-details": case "details": toast(`Prototype: would open the details for <code>${esc(id)}</code>.`); return;
+    case "siren": confirmFor = id; break;
+    case "cancel": confirmFor = null; confirmAct = null; break;
+    case "lock-go": {
+      const cmd = st.state === "locked" ? "unlock" : "lock";   // same rule as Home Assistant's toggle
+      if (lockKnown(st)) { st.state = cmd === "unlock" ? "unlocked" : "locked"; st.changed = Date.now(); }
+      else st.last = cmd;                                        // unknown stays unknown
+      demo(`lock.${cmd}`, id); confirmFor = null; break;
+    }
+    case "show-na": showNA = !showNA; break;
+    case "siren-go": confirmFor = null; demo("siren.turn_on", id); break;
+    case "vac": st.state = t.dataset.v; demo({cleaning: "vacuum.start", paused: "vacuum.pause", returning: "vacuum.return_to_base"}[t.dataset.v], id); break;
+    case "play": st.state = st.state === "playing" ? "paused" : "playing"; demo(`media_player.media_${st.state === "playing" ? "play" : "pause"}`, id); break;
+    case "press": demo("button.press", id); return;
+    case "remote": demo("remote.toggle", id); return;
+    case "all-off": lightsFor().filter(x => x.domain === "light" && !na(x)).forEach(x => S[x.id].state = "off"); toast("Prototype: would call <code>light.turn_off</code> on all available lights. Nothing was sent."); break;
+    case "cam": camDrawer(id); return;
+    case "cam-step": stepCam(+t.dataset.d); return;
+    case "close": camDrawer.open = null; confirmFor = null; document.getElementById("overlay").innerHTML = ""; return;
+    default: return;
+  }
+  render();
+});
+document.addEventListener("change", ev => {
+  const t = ev.target, id = t.dataset.id;
+  if (t.dataset.act === "bri") { S[id].bri = +t.value; demo("light.turn_on (brightness)", id); render(); }
+  else if (t.dataset.act === "vol") { S[id].vol = +t.value; demo("media_player.volume_set", id); }
+  else if (t.dataset.act === "preset") { S[id].preset = t.value; demo("climate.set_preset_mode", id); }
+  else if (t.dataset.act === "fan") { S[id].fan = t.value; demo("vacuum.set_fan_speed", id); }
+  else if (t.dataset.act === "src") demo("media_player.select_source", id);
+  else if (t.id && t.id.startsWith("inv-")) {
+    if (t.id === "inv-room") inv.room = t.value; if (t.id === "inv-domain") inv.domain = t.value;
+    if (t.id === "inv-av") inv.av = t.value; if (t.id === "inv-flag") inv.flagged = t.checked;
+    render();
+  }
+});
+document.addEventListener("input", ev => {
+  if (ev.target.id === "inv-q") { inv.q = ev.target.value; const pos = ev.target.selectionStart; render(); const n = document.getElementById("inv-q"); n.focus(); n.setSelectionRange(pos, pos); }
+});
+document.addEventListener("keydown", ev => {
+  if (!camDrawer.open) return;
+  if (ev.key === "Escape") { camDrawer.open = null; confirmFor = null; document.getElementById("overlay").innerHTML = ""; }
+  else if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") stepCam(ev.key === "ArrowRight" ? 1 : -1);
+});
+render();
+setInterval(() => { if (view === "home") { const c = document.querySelector(".clock"); if (c) c.textContent = new Date().toLocaleTimeString([], {hour: "numeric", minute: "2-digit"}); } }, 30000);
+</script>

@@ -1,0 +1,606 @@
+type: grid
+cards:
+- type: horizontal-stack
+  cards:
+  - type: vertical-stack
+    cards:
+    - type: heading
+      heading: Garage · Polestar 2
+      heading_style: title
+      icon: mdi:car-electric
+      badges:
+      - type: entity
+        entity: sensor.polestar_2_charger_connection_status
+        name: Plugged in
+        icon: mdi:power-plug
+        color: green
+        show_state: true
+        show_icon: true
+        tap_action:
+          action: more-info
+        visibility:
+        - condition: state
+          entity: sensor.polestar_2_charger_connection_status
+          state_not:
+          - Disconnected
+          - unknown
+          - unavailable
+      - type: entity
+        entity: sensor.polestar_2_charger_connection_status
+        icon: mdi:power-plug-off-outline
+        show_state: true
+        show_icon: true
+        tap_action:
+          action: more-info
+        visibility:
+        - condition: state
+          entity: sensor.polestar_2_charger_connection_status
+          state: Disconnected
+      - type: entity
+        entity: sensor.polestar_2_days_to_service
+        icon: mdi:wrench-clock
+        show_state: true
+        show_icon: true
+        tap_action:
+          action: more-info
+      - type: button
+        text: Lights
+        icon: mdi:chevron-right
+        tap_action:
+          action: none
+    - type: custom:mushroom-template-card
+      entity: sensor.polestar_2_battery_charge_level
+      icon: mdi:car-electric
+      color: '{% set b = states(''sensor.polestar_2_battery_charge_level'') %} {% set c = states(''sensor.polestar_2_charging_status'') %} {% if not is_number(b) %}var(--hp-muted){% elif c == ''Done'' or b | float >= 100 %}var(--hp-ok){% elif b | float >= 30 %}var(--hp-gold){% elif b | float >= 15 %}var(--hp-warn){% else %}var(--hp-bad){% endif %}'
+      primary: Battery
+      secondary: '{% set b = states(''sensor.polestar_2_battery_charge_level'') %} {% set r = states(''sensor.polestar_2_range'') %} {% set f = states(''sensor.polestar_2_estimate_full_charge_range'') %} {% set c = states(''sensor.polestar_2_charging_status'') %} {% set line1 = (b | float | round(0) | int ~ ''%'' if is_number(b) else ''Battery unavailable'') ~ ('' · '' ~ (r | float | round(0) | int) ~ '' mi'' if is_number(r) else '''') %} {% set line2 = (((f | float | round(0) | int) ~ '' mi at full charge'') if is_number(f) else '''') ~ ('' · Charge complete'' if c == ''Done'' else '''') %} {{ line1 ~ (''\n'' ~ line2 if line2 else '''') }}'
+      multiline_secondary: true
+      badge_icon: '{{ ''mdi:lightning-bolt'' if states(''sensor.polestar_2_charging_status'') not in [''Idle'', ''Done'', ''unknown'', ''unavailable''] else '''' }}'
+      badge_color: var(--hp-gold)
+      features:
+      - type: bar-gauge
+      features_position: bottom
+      tap_action:
+        action: more-info
+      icon_tap_action:
+        action: more-info
+      grid_options:
+        columns: full
+        rows: auto
+      card_mod:
+        style: "ha-card hui-card-features {\n  --feature-height: 6px;\n  --feature-border-radius: 3px;\n}\n"
+    - type: heading
+      heading: Charging
+      heading_style: subtitle
+      icon: mdi:ev-station
+      visibility:
+      - condition: or
+        conditions:
+        - condition: state
+          entity: sensor.polestar_2_charging_status
+          state_not:
+          - Idle
+          - unknown
+          - unavailable
+        - condition: state
+          entity: sensor.polestar_2_charger_connection_status
+          state_not:
+          - Disconnected
+          - unknown
+          - unavailable
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: tile
+        entity: sensor.polestar_2_charging_status
+        name: Status
+        icon: mdi:ev-station
+        visibility:
+        - condition: or
+          conditions:
+          - condition: state
+            entity: sensor.polestar_2_charging_status
+            state_not:
+            - Idle
+            - unknown
+            - unavailable
+          - condition: state
+            entity: sensor.polestar_2_charger_connection_status
+            state_not:
+            - Disconnected
+            - unknown
+            - unavailable
+      - type: tile
+        entity: sensor.polestar_2_charging_power
+        name: Power
+        visibility:
+        - condition: or
+          conditions:
+          - condition: state
+            entity: sensor.polestar_2_charging_status
+            state_not:
+            - Idle
+            - unknown
+            - unavailable
+          - condition: state
+            entity: sensor.polestar_2_charger_connection_status
+            state_not:
+            - Disconnected
+            - unknown
+            - unavailable
+      - type: tile
+        entity: sensor.polestar_2_charging_time
+        name: Time to full
+        icon: mdi:timer-sand
+        visibility:
+        - condition: or
+          conditions:
+          - condition: state
+            entity: sensor.polestar_2_charging_status
+            state_not:
+            - Idle
+            - unknown
+            - unavailable
+          - condition: state
+            entity: sensor.polestar_2_charger_connection_status
+            state_not:
+            - Disconnected
+            - unknown
+            - unavailable
+      - type: tile
+        entity: sensor.polestar_2_charging_target_level
+        name: Charge limit
+        icon: mdi:battery-lock
+        visibility:
+        - condition: or
+          conditions:
+          - condition: state
+            entity: sensor.polestar_2_charging_status
+            state_not:
+            - Idle
+            - unknown
+            - unavailable
+          - condition: state
+            entity: sensor.polestar_2_charger_connection_status
+            state_not:
+            - Disconnected
+            - unknown
+            - unavailable
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+      - type: tile
+        entity: sensor.polestar_2_service_warning
+        name: Service warning
+        color: red
+        visibility:
+        - condition: state
+          entity: sensor.polestar_2_service_warning
+          state_not:
+          - No Warning
+          - unknown
+          - unavailable
+      - type: tile
+        entity: sensor.polestar_2_brake_fluid_level_warning
+        name: Brake fluid
+        color: red
+        visibility:
+        - condition: state
+          entity: sensor.polestar_2_brake_fluid_level_warning
+          state_not:
+          - No Warning
+          - unknown
+          - unavailable
+      - type: tile
+        entity: sensor.polestar_2_engine_coolant_level_warning
+        name: Coolant
+        color: red
+        visibility:
+        - condition: state
+          entity: sensor.polestar_2_engine_coolant_level_warning
+          state_not:
+          - No Warning
+          - unknown
+          - unavailable
+      - type: tile
+        entity: sensor.polestar_2_oil_level_warning
+        name: Oil
+        color: red
+        visibility:
+        - condition: state
+          entity: sensor.polestar_2_oil_level_warning
+          state_not:
+          - No Warning
+          - unknown
+          - unavailable
+  - type: vertical-stack
+    cards:
+    - type: heading
+      heading: Lights & plugs
+      heading_style: title
+      icon: mdi:lightbulb-group
+      badges:
+      - type: button
+        text: Garage
+        icon: mdi:chevron-left
+        tap_action:
+          action: none
+      - type: button
+        text: All off
+        icon: mdi:lightbulb-group-off-outline
+        tap_action:
+          action: perform-action
+          perform_action: light.turn_off
+          target:
+            entity_id:
+            - light.kitchen_kitchen_island_pendants
+            - light.kitchen_kitchen_main_lights_2
+            - light.kitchen_kitchen_main_lights_zone1
+            - light.living_room_living_room_main_lights
+            - light.backyard_floodlight
+            - light.laundry_light_1
+            - light.laundry_light_2
+            - light.laundry_light_3
+            - light.laundry_light_4
+            - light.laundry_light_5
+            - light.laundry_light_6
+            - light.living_room_lamp
+            - light.basement_entry
+            - light.bedroom_hallway_light
+            - light.guest_room_hallway_light
+            - light.backyard_cam_floodlight
+          confirmation:
+            text: Turn off all lights?
+    - type: custom:mushroom-chips-card
+      alignment: start
+      chips:
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.kitchen_kitchen_island_pendants
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.kitchen_kitchen_island_pendants
+          content: Island
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.kitchen_kitchen_island_pendants'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.kitchen_kitchen_island_pendants'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.kitchen_kitchen_main_lights_2
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.kitchen_kitchen_main_lights_2
+          content: Kitchen Main
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.kitchen_kitchen_main_lights_2'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.kitchen_kitchen_main_lights_2'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.kitchen_kitchen_main_lights_zone1
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.kitchen_kitchen_main_lights_zone1
+          content: Kitchen Zone 1
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.kitchen_kitchen_main_lights_zone1'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.kitchen_kitchen_main_lights_zone1'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.living_room_living_room_main_lights
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.living_room_living_room_main_lights
+          content: Living Room
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.living_room_living_room_main_lights'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.living_room_living_room_main_lights'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: switch.great_room_great_room_main_lights_zone_2
+          state_not: unavailable
+        chip:
+          type: template
+          entity: switch.great_room_great_room_main_lights_zone_2
+          content: Great Room
+          icon: '{{ ''mdi:lightbulb'' if is_state(''switch.great_room_great_room_main_lights_zone_2'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''switch.great_room_great_room_main_lights_zone_2'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.backyard_floodlight
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.backyard_floodlight
+          content: Deck Flood
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.backyard_floodlight'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.backyard_floodlight'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.laundry_light_1
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.laundry_light_1
+          content: Laundry 1
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.laundry_light_1'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.laundry_light_1'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.laundry_light_2
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.laundry_light_2
+          content: Laundry 2
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.laundry_light_2'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.laundry_light_2'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.laundry_light_3
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.laundry_light_3
+          content: Laundry 3
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.laundry_light_3'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.laundry_light_3'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.laundry_light_4
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.laundry_light_4
+          content: Laundry 4
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.laundry_light_4'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.laundry_light_4'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.laundry_light_5
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.laundry_light_5
+          content: Laundry 5
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.laundry_light_5'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.laundry_light_5'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.laundry_light_6
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.laundry_light_6
+          content: Laundry 6
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.laundry_light_6'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.laundry_light_6'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.living_room_lamp
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.living_room_lamp
+          content: Living Lamp
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.living_room_lamp'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.living_room_lamp'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.basement_entry
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.basement_entry
+          content: Basement Entry
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.basement_entry'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.basement_entry'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.bedroom_hallway_light
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.bedroom_hallway_light
+          content: Bedroom Hall
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.bedroom_hallway_light'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.bedroom_hallway_light'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.guest_room_hallway_light
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.guest_room_hallway_light
+          content: Guest Hall
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.guest_room_hallway_light'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.guest_room_hallway_light'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: light.backyard_cam_floodlight
+          state_not: unavailable
+        chip:
+          type: template
+          entity: light.backyard_cam_floodlight
+          content: Deck Cam Light
+          icon: '{{ ''mdi:lightbulb'' if is_state(''light.backyard_cam_floodlight'', ''on'') else ''mdi:lightbulb-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''light.backyard_cam_floodlight'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: switch.wemo_mini
+          state_not: unavailable
+        chip:
+          type: template
+          entity: switch.wemo_mini
+          content: Wemo
+          icon: '{{ ''mdi:power-plug'' if is_state(''switch.wemo_mini'', ''on'') else ''mdi:power-plug-off-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''switch.wemo_mini'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: switch.night_light_socket
+          state_not: unavailable
+        chip:
+          type: template
+          entity: switch.night_light_socket
+          content: Night Light
+          icon: '{{ ''mdi:power-plug'' if is_state(''switch.night_light_socket'', ''on'') else ''mdi:power-plug-off-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''switch.night_light_socket'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: switch.recliners_socket
+          state_not: unavailable
+        chip:
+          type: template
+          entity: switch.recliners_socket
+          content: Recliners
+          icon: '{{ ''mdi:power-plug'' if is_state(''switch.recliners_socket'', ''on'') else ''mdi:power-plug-off-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''switch.recliners_socket'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: conditional
+        conditions:
+        - condition: state
+          entity: switch.record_player_socket
+          state_not: unavailable
+        chip:
+          type: template
+          entity: switch.record_player_socket
+          content: Record Player
+          icon: '{{ ''mdi:power-plug'' if is_state(''switch.record_player_socket'', ''on'') else ''mdi:power-plug-off-outline'' }}'
+          icon_color: '{{ ''yellow'' if is_state(''switch.record_player_socket'', ''on'') else ''grey'' }}'
+          tap_action:
+            action: toggle
+          hold_action:
+            action: more-info
+      - type: template
+        icon: '{{ ''mdi:lightbulb-off-outline'' if [''light.kitchen_kitchen_island_pendants'', ''light.kitchen_kitchen_main_lights_2'', ''light.kitchen_kitchen_main_lights_zone1'', ''light.living_room_living_room_main_lights'', ''switch.great_room_great_room_main_lights_zone_2'', ''light.backyard_floodlight'', ''light.laundry_light_1'', ''light.laundry_light_2'', ''light.laundry_light_3'', ''light.laundry_light_4'', ''light.laundry_light_5'', ''light.laundry_light_6'', ''light.living_room_lamp'', ''light.basement_entry'', ''light.bedroom_hallway_light'', ''light.guest_room_hallway_light'', ''light.backyard_cam_floodlight'', ''switch.wemo_mini'', ''switch.night_light_socket'', ''switch.recliners_socket'', ''switch.record_player_socket''] | map(''states'') | select(''eq'', ''unavailable'') | list | count else ''mdi:check-circle-outline'' }}'
+        icon_color: '{{ ''amber'' if [''light.kitchen_kitchen_island_pendants'', ''light.kitchen_kitchen_main_lights_2'', ''light.kitchen_kitchen_main_lights_zone1'', ''light.living_room_living_room_main_lights'', ''switch.great_room_great_room_main_lights_zone_2'', ''light.backyard_floodlight'', ''light.laundry_light_1'', ''light.laundry_light_2'', ''light.laundry_light_3'', ''light.laundry_light_4'', ''light.laundry_light_5'', ''light.laundry_light_6'', ''light.living_room_lamp'', ''light.basement_entry'', ''light.bedroom_hallway_light'', ''light.guest_room_hallway_light'', ''light.backyard_cam_floodlight'', ''switch.wemo_mini'', ''switch.night_light_socket'', ''switch.recliners_socket'', ''switch.record_player_socket''] | map(''states'') | select(''eq'', ''unavailable'') | list | count else ''grey'' }}'
+        content: '{% set n = [''light.kitchen_kitchen_island_pendants'', ''light.kitchen_kitchen_main_lights_2'', ''light.kitchen_kitchen_main_lights_zone1'', ''light.living_room_living_room_main_lights'', ''switch.great_room_great_room_main_lights_zone_2'', ''light.backyard_floodlight'', ''light.laundry_light_1'', ''light.laundry_light_2'', ''light.laundry_light_3'', ''light.laundry_light_4'', ''light.laundry_light_5'', ''light.laundry_light_6'', ''light.living_room_lamp'', ''light.basement_entry'', ''light.bedroom_hallway_light'', ''light.guest_room_hallway_light'', ''light.backyard_cam_floodlight'', ''switch.wemo_mini'', ''switch.night_light_socket'', ''switch.recliners_socket'', ''switch.record_player_socket''] | map(''states'') | select(''eq'', ''unavailable'') | list | count %}{{ (n ~ '' offline'') if n else ''All online'' }}'
+        entity_id:
+        - light.kitchen_kitchen_island_pendants
+        - light.kitchen_kitchen_main_lights_2
+        - light.kitchen_kitchen_main_lights_zone1
+        - light.living_room_living_room_main_lights
+        - switch.great_room_great_room_main_lights_zone_2
+        - light.backyard_floodlight
+        - light.laundry_light_1
+        - light.laundry_light_2
+        - light.laundry_light_3
+        - light.laundry_light_4
+        - light.laundry_light_5
+        - light.laundry_light_6
+        - light.living_room_lamp
+        - light.basement_entry
+        - light.bedroom_hallway_light
+        - light.guest_room_hallway_light
+        - light.backyard_cam_floodlight
+        - switch.wemo_mini
+        - switch.night_light_socket
+        - switch.recliners_socket
+        - switch.record_player_socket
+        tap_action:
+          action: navigate
+          navigation_path: /home-panel/review
+  grid_options:
+    columns: full
+  card_mod:
+    style: "#root {\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n  scrollbar-width: none;\n  gap: 12px;\n  align-items: flex-start;\n}\n#root::-webkit-scrollbar {\n  display: none;\n}\n#root > hui-card > * {\n  flex: 0 0 calc(100% - 28px);\n  min-width: 0;\n  scroll-snap-align: start;\n}\n"

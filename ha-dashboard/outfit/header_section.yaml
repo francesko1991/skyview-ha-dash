@@ -1,0 +1,114 @@
+# Home Panel header: clock, status chips, Outfit chip and the What-to-wear note.
+# Paste into: Home Panel > pencil > (clock section) ⋮ > Edit section > code editor.
+type: grid
+column_span: 3
+cards:
+- type: clock
+  clock_style: digital
+  clock_size: large
+  no_background: true
+  date_format:
+  - weekday-long
+  - month-long
+  - day-numeric
+  grid_options:
+    columns: full
+- type: custom:mushroom-chips-card
+  alignment: center
+  chips:
+  - type: weather
+    entity: weather.forecast_home
+    show_temperature: true
+    show_conditions: true
+    tap_action:
+      action: more-info
+  - type: template
+    icon: '{{ ''mdi:progress-clock'' if is_state(''script.refresh_weather_clothing_advice'', ''on'') else (states(''input_text.outfit_icon'') if states(''input_text.outfit_icon'') is match(''mdi:'') else ''mdi:hanger'') }}'
+    icon_color: '{{ ''amber'' if is_state(''input_text.outfit_headline'', ''Advice unavailable'') else ''yellow'' }}'
+    content: '{{ ''Thinking…'' if is_state(''script.refresh_weather_clothing_advice'', ''on'') else (states(''input_text.outfit_headline'') if has_value(''input_text.outfit_headline'') and states(''input_text.outfit_headline'') | length > 0 else ''What to wear?'') }}'
+    entity_id:
+    - script.refresh_weather_clothing_advice
+    - input_text.outfit_headline
+    - input_text.outfit_icon
+    tap_action:
+      action: perform-action
+      perform_action: script.refresh_weather_clothing_advice
+    hold_action:
+      action: more-info
+      entity: input_text.weather_clothing_advice
+  - type: template
+    entity: lock.front_door
+    icon: '{{ ''mdi:lock-question'' if states(''lock.front_door'') in [''unknown'',''unavailable''] else ''mdi:lock'' }}'
+    icon_color: '{{ ''amber'' if states(''lock.front_door'') in [''unknown'',''unavailable'',''jammed'',''open''] else ''teal'' }}'
+    content: 'Lock: {{ state_translated(''lock.front_door'') }}'
+    tap_action:
+      action: more-info
+  - type: template
+    icon: '{% set c = states.camera | map(attribute=''entity_id'') | list %}{{ ''mdi:cctv-off'' if c | map(''states'') | select(''in'', [''unavailable'', ''unknown'']) | list | count else ''mdi:cctv'' }}'
+    icon_color: '{% set c = states.camera | map(attribute=''entity_id'') | list %}{{ ''red'' if c | map(''states'') | select(''in'', [''unavailable'', ''unknown'']) | list | count else ''grey'' }}'
+    content: '{% set c = states.camera | map(attribute=''entity_id'') | list %}{% set off = c | map(''states'') | select(''in'', [''unavailable'', ''unknown'']) | list | count %}{{ (off ~ '' of '' ~ (c | count) ~ '' cameras offline'') if off else (''All '' ~ (c | count) ~ '' cameras online'') }}'
+    tap_action:
+      action: navigate
+      navigation_path: /home-panel/cameras
+  - type: template
+    icon: '{{ ''mdi:lightbulb-off-outline'' if [''light.backyard_cam_floodlight'', ''light.backyard_floodlight'', ''light.basement_entry'', ''light.bedroom_hallway_light'', ''light.guest_room_hallway_light'', ''light.kitchen_kitchen_island_pendants'', ''light.kitchen_kitchen_main_lights_2'', ''light.kitchen_kitchen_main_lights_zone1'', ''light.laundry_light_1'', ''light.laundry_light_2'', ''light.laundry_light_3'', ''light.laundry_light_4'', ''light.laundry_light_5'', ''light.laundry_light_6'', ''light.living_room_lamp'', ''light.living_room_living_room_main_lights'', ''switch.great_room_great_room_main_lights_zone_2'', ''switch.night_light_socket'', ''switch.recliners_socket'', ''switch.record_player_socket'', ''switch.wemo_mini''] | map(''states'') | select(''eq'', ''unavailable'') | list | count else ''mdi:lightbulb-group-outline'' }}'
+    icon_color: '{{ ''amber'' if [''light.backyard_cam_floodlight'', ''light.backyard_floodlight'', ''light.basement_entry'', ''light.bedroom_hallway_light'', ''light.guest_room_hallway_light'', ''light.kitchen_kitchen_island_pendants'', ''light.kitchen_kitchen_main_lights_2'', ''light.kitchen_kitchen_main_lights_zone1'', ''light.laundry_light_1'', ''light.laundry_light_2'', ''light.laundry_light_3'', ''light.laundry_light_4'', ''light.laundry_light_5'', ''light.laundry_light_6'', ''light.living_room_lamp'', ''light.living_room_living_room_main_lights'', ''switch.great_room_great_room_main_lights_zone_2'', ''switch.night_light_socket'', ''switch.recliners_socket'', ''switch.record_player_socket'', ''switch.wemo_mini''] | map(''states'') | select(''eq'', ''unavailable'') | list | count else ''grey'' }}'
+    content: '{% set off = [''light.backyard_cam_floodlight'', ''light.backyard_floodlight'', ''light.basement_entry'', ''light.bedroom_hallway_light'', ''light.guest_room_hallway_light'', ''light.kitchen_kitchen_island_pendants'', ''light.kitchen_kitchen_main_lights_2'', ''light.kitchen_kitchen_main_lights_zone1'', ''light.laundry_light_1'', ''light.laundry_light_2'', ''light.laundry_light_3'', ''light.laundry_light_4'', ''light.laundry_light_5'', ''light.laundry_light_6'', ''light.living_room_lamp'', ''light.living_room_living_room_main_lights'', ''switch.great_room_great_room_main_lights_zone_2'', ''switch.night_light_socket'', ''switch.recliners_socket'', ''switch.record_player_socket'', ''switch.wemo_mini''] | map(''states'') | select(''eq'', ''unavailable'') | list | count %}{{ (off ~ '' lights/plugs offline'') if off else ''All lights online'' }}'
+    entity_id:
+    - light.backyard_cam_floodlight
+    - light.backyard_floodlight
+    - light.basement_entry
+    - light.bedroom_hallway_light
+    - light.guest_room_hallway_light
+    - light.kitchen_kitchen_island_pendants
+    - light.kitchen_kitchen_main_lights_2
+    - light.kitchen_kitchen_main_lights_zone1
+    - light.laundry_light_1
+    - light.laundry_light_2
+    - light.laundry_light_3
+    - light.laundry_light_4
+    - light.laundry_light_5
+    - light.laundry_light_6
+    - light.living_room_lamp
+    - light.living_room_living_room_main_lights
+    - switch.great_room_great_room_main_lights_zone_2
+    - switch.night_light_socket
+    - switch.recliners_socket
+    - switch.record_player_socket
+    - switch.wemo_mini
+    tap_action:
+      action: navigate
+      navigation_path: /home-panel/review
+  - type: template
+    icon: mdi:tune-variant
+    icon_color: grey
+    content: Setup · {{ ['light.basement_entry', 'light.bedroom_hallway_light', 'light.guest_room_hallway_light', 'light.laundry_light_1', 'light.laundry_light_2', 'light.laundry_light_3', 'light.laundry_light_4', 'light.laundry_light_5', 'light.laundry_light_6', 'light.living_room_lamp', 'media_player.greatroom_display', 'media_player.home_sync', 'media_player.kitchen_display', 'media_player.master_bedroom_speaker', 'media_player.office_speaker', 'media_player.samsung_tv', 'media_player.soundbar', 'switch.night_light_socket', 'switch.recliners_socket', 'switch.record_player_socket', 'switch.wemo_mini'] | map('area_id') | select('none') | list | count }} items
+    tap_action:
+      action: navigate
+      navigation_path: /home-panel/review
+  grid_options:
+    columns: full
+- type: custom:mushroom-template-card
+  entity: input_text.weather_clothing_advice
+  icon: '{{ states(''input_text.outfit_icon'') if states(''input_text.outfit_icon'') is match(''mdi:'') else ''mdi:hanger'' }}'
+  color: var(--hp-gold)
+  primary: '{% set h = now().hour %}{{ ''Good morning'' if h < 12 else (''Good afternoon'' if h < 17 else ''Good evening'') }}{{ '', '' ~ user if user else '''' }} · what to wear'
+  secondary: '{% set t = state_attr(''input_datetime.outfit_updated'', ''timestamp'') %}{% set temp = state_attr(''weather.forecast_home'', ''temperature'') %}{{ states(''input_text.weather_clothing_advice'') }}{% if t %}{{ ''
+
+    '' }}Updated {{ relative_time(as_datetime(t)) }} ago · {{ state_translated(''weather.forecast_home'') }}{% if is_number(temp) %} {{ temp }}°F{% endif %}{% endif %}'
+  multiline_secondary: true
+  tap_action:
+    action: perform-action
+    perform_action: script.refresh_weather_clothing_advice
+  icon_tap_action:
+    action: more-info
+  grid_options:
+    columns: full
+    rows: auto
+  visibility:
+  - condition: state
+    entity: input_text.weather_clothing_advice
+    state_not:
+    - unknown
+    - unavailable
+    - ''

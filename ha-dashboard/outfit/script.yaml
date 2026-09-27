@@ -1,0 +1,122 @@
+alias: Refresh Weather Clothing Advice
+description: >-
+  Asks OpenAI (via AI Task) what to wear, using today's forecast and, on work days before
+  departure, the drive time to work. Only weather numbers, times and drive minutes are sent;
+  no names or addresses. Results go into input_text helpers shown on the Home Panel dashboard.
+mode: single
+sequence:
+  - action: weather.get_forecasts
+    target:
+      entity_id: weather.forecast_home
+    data:
+      type: hourly
+    response_variable: hourly
+  - action: weather.get_forecasts
+    target:
+      entity_id: weather.forecast_home
+    data:
+      type: daily
+    response_variable: daily
+  - variables:
+      w: weather.forecast_home
+      next12: "{{ (hourly[w].forecast if hourly is defined and w in hourly else [])[:12] }}"
+      today: "{{ (daily[w].forecast[0] if daily is defined and w in daily and daily[w].forecast else {}) }}"
+      temp_now: "{{ state_attr(w, 'temperature') }}"
+      feels_like: "{{ state_attr(w, 'apparent_temperature') or state_attr(w, 'temperature') }}"
+      temps: "{{ next12 | map(attribute='temperature') | select('number') | list }}"
+      rains: "{{ next12 | map(attribute='precipitation_probability') | select('number') | list }}"
+      winds: "{{ next12 | map(attribute='wind_speed') | select('number') | list }}"
+      high: "{{ today.temperature if today.temperature is defined else ((temps | max) if temps else temp_now) }}"
+      low: "{{ today.templow if today.templow is defined else ((temps | min) if temps else temp_now) }}"
+      rain_chance: "{{ (rains | max) if rains else 0 }}"
+      wind_max: "{{ ((winds | max) if winds else (state_attr(w, 'wind_speed') or 0)) | round(0) }}"
+      departure_ts: "{{ today_at(states('input_datetime.work_departure')).timestamp() if has_value('input_datetime.work_departure') else none }}"
+      commute_mode: "{{ departure_ts is not none and now().weekday() < 5 and now().timestamp() < departure_ts }}"
+      drive_min: "{{ states('sensor.work_commute') | float(0) | round(0) | int if is_number(states('sensor.work_commute')) else none }}"
+      drive_mi: "{{ state_attr('sensor.work_commute', 'distance') | float(0) | round(0) | int if is_number(state_attr('sensor.work_commute', 'distance')) else none }}"
+      range_mi: "{{ states('sensor.polestar_2_range') | float(0) | round(0) | int if is_number(states('sensor.polestar_2_range')) else none }}"
+      facts: >-
+        Local time: {{ now().strftime('%A %-I:%M %p') }}.
+        Now: {{ state_translated(w) }}, {{ temp_now }}°F (feels like {{ feels_like }}°F), humidity {{ state_attr(w, 'humidity') }}%.
+        Next 12 hours: high {{ high }}°F, low {{ low }}°F, max rain chance {{ rain_chance }}%, wind up to {{ wind_max }} mph.
+        {% if commute_mode %}{% set departure = as_datetime(departure_ts) | as_local %}
+        Work day. Planned departure {{ departure.strftime('%-I:%M %p') }} by car.
+        {% if drive_min is not none %}Current drive time to work {{ drive_min }} min{% if drive_mi is not none %} ({{ drive_mi }} mi){% endif %}; leaving at {{ departure.strftime('%-I:%M %p') }} means arriving around {{ (departure + timedelta(minutes=drive_min)).strftime('%-I:%M %p') }}.{% endif %}
+        {% if drive_mi is not none and range_mi is not none %}Car range {{ range_mi }} mi; round trip {{ drive_mi * 2 }} mi.{% endif %}
+        {% endif %}
+  - action: ai_task.generate_data
+    continue_on_error: true
+    data:
+      task_name: weather_clothing_advice
+      entity_id: ai_task.openai_ai_task
+      instructions: >-
+        You are a calm, concise home concierge. Using only these facts, say what to wear.
+
+        {{ facts }}
+
+        Rules: advice is natural and under 180 characters, mentions the temperature range and
+        rain or wind if relevant. If a drive time is given, add a short commute note (for example
+        when they arrive or if traffic is heavy). Mention the car only if the round trip would
+        use more than half the range. No markdown, no emoji.
+      structure:
+        headline:
+          description: What to wear in at most 4 words, e.g. "Rain jacket" or "Light layers".
+          required: true
+          selector:
+            text:
+        advice:
+          description: One or two sentences, under 180 characters.
+          required: true
+          selector:
+            text:
+        icon:
+          description: >-
+            Exactly one of mdi:umbrella, mdi:coat-rack, mdi:tshirt-crew, mdi:weather-snowy,
+            mdi:sunglasses, mdi:hanger.
+          required: true
+          selector:
+            text:
+    response_variable: result
+  - if:
+      - condition: template
+        value_template: >-
+          {{ result is defined and result.data is mapping and result.data.headline is defined and result.data.advice is defined }}
+    then:
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.outfit_headline
+        data:
+          value: "{{ result.data.headline | string | truncate(40, true, '') }}"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.weather_clothing_advice
+        data:
+          value: "{{ result.data.advice | string | truncate(250, true, '…') }}"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.outfit_icon
+        data:
+          value: >-
+            {% set allowed = ['mdi:umbrella', 'mdi:coat-rack', 'mdi:tshirt-crew', 'mdi:weather-snowy', 'mdi:sunglasses', 'mdi:hanger'] %}
+            {{ result.data.icon if result.data.icon in allowed else 'mdi:hanger' }}
+    else:
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.outfit_headline
+        data:
+          value: Advice unavailable
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.weather_clothing_advice
+        data:
+          value: Couldn't get advice from OpenAI just now. Tap to try again.
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.outfit_icon
+        data:
+          value: mdi:alert-circle-outline
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.outfit_updated
+    data:
+      timestamp: "{{ now().timestamp() }}"

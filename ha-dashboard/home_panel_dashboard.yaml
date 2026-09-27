@@ -1,0 +1,2389 @@
+# Home Panel dashboard — DRAFT generated from the sanitized inventory of 2026-09-26
+# Paste into a NEW dashboard: Settings > Dashboards > Add dashboard > New dashboard from scratch,
+# then open it > pencil (Edit) > three-dot menu > Raw configuration editor. See INSTALL.md.
+# Needs: Mushroom 5.x (custom:mushroom-chips-card). Optional: themes/home_panel.yaml.
+# Colours are NOT set here; they live in themes/home_panel.yaml.
+
+title: Home Panel
+views:
+  - title: Home
+    path: home
+    icon: "mdi:home"
+    type: sections
+    max_columns: 3
+    theme: Home Panel
+    dense_section_placement: true
+    sections:
+      - type: grid
+        column_span: 3
+        cards:
+          - type: clock
+            clock_style: digital
+            clock_size: large
+            no_background: true
+            grid_options:
+              columns: full
+          - type: "custom:mushroom-chips-card"
+            alignment: start
+            chips:
+              - type: template
+                entity: lock.front_door
+                icon: "{{ 'mdi:lock-question' if states('lock.front_door') in ['unknown','unavailable'] else 'mdi:lock' }}"
+                icon_color: "{{ 'amber' if states('lock.front_door') in ['unknown','unavailable','jammed','open'] else 'teal' }}"
+                content: "Lock: {{ state_translated('lock.front_door') }}"
+                tap_action:
+                  action: more-info
+              - type: template
+                icon: "mdi:cctv-off"
+                icon_color: "{{ 'red' if ['camera.backyard', 'camera.basement_basement_cam_fluent', 'camera.homesite_back_deck_fluent', 'camera.homesite_driveway_fluent', 'camera.front_gate_fluent', 'camera.front_yard_fluent', 'camera.great_room_great_room_cam_fluent', 'camera.living_room_living_room_cam_fluent', 'camera.front_yard_fluent_2'] | map('states') | select('in', ['unavailable','unknown']) | list | count else 'teal' }}"
+                content: "{{ ['camera.backyard', 'camera.basement_basement_cam_fluent', 'camera.homesite_back_deck_fluent', 'camera.homesite_driveway_fluent', 'camera.front_gate_fluent', 'camera.front_yard_fluent', 'camera.great_room_great_room_cam_fluent', 'camera.living_room_living_room_cam_fluent', 'camera.front_yard_fluent_2'] | map('states') | select('in', ['unavailable','unknown']) | list | count }} of 9 cameras offline"
+                entity_id:
+                  - camera.backyard
+                  - camera.basement_basement_cam_fluent
+                  - camera.homesite_back_deck_fluent
+                  - camera.homesite_driveway_fluent
+                  - camera.front_gate_fluent
+                  - camera.front_yard_fluent
+                  - camera.great_room_great_room_cam_fluent
+                  - camera.living_room_living_room_cam_fluent
+                  - camera.front_yard_fluent_2
+                tap_action:
+                  action: navigate
+                  navigation_path: /home-panel/cameras
+              - type: template
+                icon: "mdi:tag-search"
+                icon_color: amber
+                content: "5 camera names to check"
+                tap_action:
+                  action: navigate
+                  navigation_path: /home-panel/review
+              - type: template
+                icon: "mdi:lightbulb-off-outline"
+                icon_color: "{{ 'red' if ['light.backyard_cam_floodlight', 'light.backyard_floodlight', 'light.basement_entry', 'light.bedroom_hallway_light', 'light.guest_room_hallway_light', 'light.kitchen_kitchen_island_pendants', 'light.kitchen_kitchen_main_lights_2', 'light.kitchen_kitchen_main_lights_zone1', 'light.laundry_light_1', 'light.laundry_light_2', 'light.laundry_light_3', 'light.laundry_light_4', 'light.laundry_light_5', 'light.laundry_light_6', 'light.living_room_lamp', 'light.living_room_living_room_main_lights', 'switch.great_room_great_room_main_lights_zone_2', 'switch.night_light_socket', 'switch.recliners_socket', 'switch.record_player_socket', 'switch.wemo_mini'] | map('states') | select('eq', 'unavailable') | list | count else 'teal' }}"
+                content: "{{ ['light.backyard_cam_floodlight', 'light.backyard_floodlight', 'light.basement_entry', 'light.bedroom_hallway_light', 'light.guest_room_hallway_light', 'light.kitchen_kitchen_island_pendants', 'light.kitchen_kitchen_main_lights_2', 'light.kitchen_kitchen_main_lights_zone1', 'light.laundry_light_1', 'light.laundry_light_2', 'light.laundry_light_3', 'light.laundry_light_4', 'light.laundry_light_5', 'light.laundry_light_6', 'light.living_room_lamp', 'light.living_room_living_room_main_lights', 'switch.great_room_great_room_main_lights_zone_2', 'switch.night_light_socket', 'switch.recliners_socket', 'switch.record_player_socket', 'switch.wemo_mini'] | map('states') | select('eq', 'unavailable') | list | count }} lights/plugs unavailable"
+                entity_id:
+                  - light.backyard_cam_floodlight
+                  - light.backyard_floodlight
+                  - light.basement_entry
+                  - light.bedroom_hallway_light
+                  - light.guest_room_hallway_light
+                  - light.kitchen_kitchen_island_pendants
+                  - light.kitchen_kitchen_main_lights_2
+                  - light.kitchen_kitchen_main_lights_zone1
+                  - light.laundry_light_1
+                  - light.laundry_light_2
+                  - light.laundry_light_3
+                  - light.laundry_light_4
+                  - light.laundry_light_5
+                  - light.laundry_light_6
+                  - light.living_room_lamp
+                  - light.living_room_living_room_main_lights
+                  - switch.great_room_great_room_main_lights_zone_2
+                  - switch.night_light_socket
+                  - switch.recliners_socket
+                  - switch.record_player_socket
+                  - switch.wemo_mini
+                tap_action:
+                  action: navigate
+                  navigation_path: /home-panel/review
+              - type: template
+                icon: "mdi:map-marker-question-outline"
+                icon_color: grey
+                content: "{{ ['light.basement_entry', 'light.bedroom_hallway_light', 'light.guest_room_hallway_light', 'light.laundry_light_1', 'light.laundry_light_2', 'light.laundry_light_3', 'light.laundry_light_4', 'light.laundry_light_5', 'light.laundry_light_6', 'light.living_room_lamp', 'media_player.greatroom_display', 'media_player.home_sync', 'media_player.kitchen_display', 'media_player.master_bedroom_speaker', 'media_player.office_speaker', 'media_player.samsung_tv', 'media_player.soundbar', 'switch.night_light_socket', 'switch.recliners_socket', 'switch.record_player_socket', 'switch.wemo_mini'] | reject('area_id') | list | count }} controls with no area"
+                tap_action:
+                  action: navigate
+                  navigation_path: /home-panel/review
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: heading
+            heading: Security
+            heading_style: title
+            icon: "mdi:shield-home"
+          - type: tile
+            entity: lock.front_door
+          - type: markdown
+            content: "**Lock state is not confirmed.** Home Assistant reports this lock as *{{ state_translated('lock.front_door') }}*, so this dashboard can't show whether the door is locked. The door sensor is *{{ state_translated('binary_sensor.front_door_door') }}*."
+            visibility:
+              - condition: state
+                entity: lock.front_door
+                state:
+                  - unavailable
+                  - unknown
+          - type: button
+            name: Lock…
+            icon: "mdi:lock"
+            show_state: false
+            tap_action:
+              action: perform-action
+              perform_action: lock.lock
+              target:
+                entity_id: lock.front_door
+              confirmation:
+                text: "Send a lock command to the front door? Its current state is not confirmed."
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: button
+            name: Unlock…
+            icon: "mdi:lock-open-variant"
+            show_state: false
+            tap_action:
+              action: perform-action
+              perform_action: lock.unlock
+              target:
+                entity_id: lock.front_door
+              confirmation:
+                text: "Unlock the front door?"
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: tile
+            entity: binary_sensor.front_door_door
+            name: Front Door Sensor
+          - type: tile
+            entity: sensor.front_door_battery
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cleaning
+            heading_style: title
+            icon: "mdi:robot-vacuum"
+          - type: tile
+            entity: vacuum.living_room_vacuum
+            features:
+              - type: vacuum-commands
+                commands:
+                  - start_pause
+                  - return_home
+                  - locate
+              - type: vacuum-fan-speed
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: sensor.living_room_vacuum_battery
+          - type: tile
+            entity: button.living_room_vacuum_full_cleaning
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_vacuum_full_cleaning
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_vacuum_full_cleaning
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+            badges:
+              - type: button
+                text: All 9 cameras
+                icon: "mdi:arrow-right"
+                tap_action:
+                  action: navigate
+                  navigation_path: /home-panel/cameras
+          - type: picture-entity
+            entity: camera.backyard
+            name: Backyard
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+          - type: picture-entity
+            entity: camera.basement_basement_cam_fluent
+            name: Basement Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+          - type: picture-entity
+            entity: camera.great_room_great_room_cam_fluent
+            name: Great Room Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+          - type: picture-entity
+            entity: camera.living_room_living_room_cam_fluent
+            name: Living Room Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+          - type: picture-entity
+            entity: camera.front_yard_fluent_2
+            name: Front Yard · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 6
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Climate
+            heading_style: title
+            icon: "mdi:thermostat"
+          - type: tile
+            entity: climate.great_room_thermostat
+            name: Great Room Thermostat
+            features:
+              - type: target-temperature
+              - type: climate-hvac-modes
+                style: icons
+                hvac_modes:
+                  - heat
+                  - "off"
+              - type: climate-preset-modes
+                style: dropdown
+                preset_modes:
+                  - away
+                  - home
+                  - sleep
+                  - away_indefinitely
+            features_position: bottom
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: climate.living_room_thermostat
+            name: Living Room Thermostat
+            features:
+              - type: target-temperature
+              - type: climate-hvac-modes
+                style: icons
+                hvac_modes:
+                  - cool
+                  - "off"
+              - type: climate-preset-modes
+                style: dropdown
+                preset_modes:
+                  - home
+                  - away
+                  - sleep
+                  - away_indefinitely
+            features_position: bottom
+            grid_options:
+              columns: 6
+          - type: tile
+            entity: sensor.great_room_thermostat_humidity
+            name: Great Room Humidity
+          - type: tile
+            entity: sensor.living_room_thermostat_humidity
+            name: Living Room Humidity
+          - type: tile
+            entity: sensor.bedroom_sensor_temperature
+            name: Bedroom Temperature
+          - type: tile
+            entity: binary_sensor.bedroom_sensor_occupancy
+            name: Bedroom Occupancy
+          - type: tile
+            entity: binary_sensor.living_room_thermostat_occupancy
+            name: Living Room Occupancy
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights and plugs
+            heading_style: title
+            icon: "mdi:lightbulb-group"
+          - type: heading
+            heading: Back Deck
+            heading_style: subtitle
+          - type: tile
+            entity: light.backyard_cam_floodlight
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.backyard_cam_floodlight
+                state_not: unavailable
+          - type: tile
+            entity: light.backyard_floodlight
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.backyard_floodlight
+                state_not: unavailable
+          - type: heading
+            heading: Great Room
+            heading_style: subtitle
+          - type: tile
+            entity: switch.great_room_great_room_main_lights_zone_2
+            visibility:
+              - condition: state
+                entity: switch.great_room_great_room_main_lights_zone_2
+                state_not: unavailable
+          - type: heading
+            heading: Kitchen
+            heading_style: subtitle
+          - type: tile
+            entity: light.kitchen_kitchen_island_pendants
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.kitchen_kitchen_island_pendants
+                state_not: unavailable
+          - type: tile
+            entity: light.kitchen_kitchen_main_lights_2
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.kitchen_kitchen_main_lights_2
+                state_not: unavailable
+          - type: tile
+            entity: light.kitchen_kitchen_main_lights_zone1
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.kitchen_kitchen_main_lights_zone1
+                state_not: unavailable
+          - type: heading
+            heading: Living Room
+            heading_style: subtitle
+          - type: tile
+            entity: light.living_room_living_room_main_lights
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.living_room_living_room_main_lights
+                state_not: unavailable
+          - type: heading
+            heading: No area yet
+            heading_style: subtitle
+          - type: tile
+            entity: light.basement_entry
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.basement_entry
+                state_not: unavailable
+          - type: tile
+            entity: light.bedroom_hallway_light
+            name: Bedroom Hallway Light
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.bedroom_hallway_light
+                state_not: unavailable
+          - type: tile
+            entity: light.guest_room_hallway_light
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.guest_room_hallway_light
+                state_not: unavailable
+          - type: tile
+            entity: light.laundry_light_1
+            name: Laundry Light 1
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_1
+                state_not: unavailable
+          - type: tile
+            entity: light.laundry_light_2
+            name: Laundry Light 2
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_2
+                state_not: unavailable
+          - type: tile
+            entity: light.laundry_light_3
+            name: Laundry Light 3
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_3
+                state_not: unavailable
+          - type: tile
+            entity: light.laundry_light_4
+            name: Laundry Light 4
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_4
+                state_not: unavailable
+          - type: tile
+            entity: light.laundry_light_5
+            name: Laundry Light 5
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_5
+                state_not: unavailable
+          - type: tile
+            entity: light.laundry_light_6
+            name: Laundry Light 6
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_6
+                state_not: unavailable
+          - type: tile
+            entity: light.living_room_lamp
+            name: Living Room Lamp
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.living_room_lamp
+                state_not: unavailable
+          - type: tile
+            entity: switch.night_light_socket
+            name: Night Light Socket
+            visibility:
+              - condition: state
+                entity: switch.night_light_socket
+                state_not: unavailable
+          - type: tile
+            entity: switch.recliners_socket
+            visibility:
+              - condition: state
+                entity: switch.recliners_socket
+                state_not: unavailable
+          - type: tile
+            entity: switch.record_player_socket
+            visibility:
+              - condition: state
+                entity: switch.record_player_socket
+                state_not: unavailable
+          - type: tile
+            entity: switch.wemo_mini
+            visibility:
+              - condition: state
+                entity: switch.wemo_mini
+                state_not: unavailable
+          - type: heading
+            heading: Unavailable right now
+            heading_style: subtitle
+            icon: "mdi:alert-circle-outline"
+            visibility:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: light.backyard_cam_floodlight
+                    state: unavailable
+                  - condition: state
+                    entity: light.backyard_floodlight
+                    state: unavailable
+                  - condition: state
+                    entity: light.basement_entry
+                    state: unavailable
+                  - condition: state
+                    entity: light.bedroom_hallway_light
+                    state: unavailable
+                  - condition: state
+                    entity: light.guest_room_hallway_light
+                    state: unavailable
+                  - condition: state
+                    entity: light.kitchen_kitchen_island_pendants
+                    state: unavailable
+                  - condition: state
+                    entity: light.kitchen_kitchen_main_lights_2
+                    state: unavailable
+                  - condition: state
+                    entity: light.kitchen_kitchen_main_lights_zone1
+                    state: unavailable
+                  - condition: state
+                    entity: light.laundry_light_1
+                    state: unavailable
+                  - condition: state
+                    entity: light.laundry_light_2
+                    state: unavailable
+                  - condition: state
+                    entity: light.laundry_light_3
+                    state: unavailable
+                  - condition: state
+                    entity: light.laundry_light_4
+                    state: unavailable
+                  - condition: state
+                    entity: light.laundry_light_5
+                    state: unavailable
+                  - condition: state
+                    entity: light.laundry_light_6
+                    state: unavailable
+                  - condition: state
+                    entity: light.living_room_lamp
+                    state: unavailable
+                  - condition: state
+                    entity: light.living_room_living_room_main_lights
+                    state: unavailable
+                  - condition: state
+                    entity: switch.great_room_great_room_main_lights_zone_2
+                    state: unavailable
+                  - condition: state
+                    entity: switch.night_light_socket
+                    state: unavailable
+                  - condition: state
+                    entity: switch.recliners_socket
+                    state: unavailable
+                  - condition: state
+                    entity: switch.record_player_socket
+                    state: unavailable
+                  - condition: state
+                    entity: switch.wemo_mini
+                    state: unavailable
+          - type: tile
+            entity: light.backyard_cam_floodlight
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.backyard_cam_floodlight
+                state: unavailable
+          - type: tile
+            entity: light.backyard_floodlight
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.backyard_floodlight
+                state: unavailable
+          - type: tile
+            entity: light.basement_entry
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.basement_entry
+                state: unavailable
+          - type: tile
+            entity: light.bedroom_hallway_light
+            name: Bedroom Hallway Light
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.bedroom_hallway_light
+                state: unavailable
+          - type: tile
+            entity: light.guest_room_hallway_light
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.guest_room_hallway_light
+                state: unavailable
+          - type: tile
+            entity: light.kitchen_kitchen_island_pendants
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.kitchen_kitchen_island_pendants
+                state: unavailable
+          - type: tile
+            entity: light.kitchen_kitchen_main_lights_2
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.kitchen_kitchen_main_lights_2
+                state: unavailable
+          - type: tile
+            entity: light.kitchen_kitchen_main_lights_zone1
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.kitchen_kitchen_main_lights_zone1
+                state: unavailable
+          - type: tile
+            entity: light.laundry_light_1
+            name: Laundry Light 1
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_1
+                state: unavailable
+          - type: tile
+            entity: light.laundry_light_2
+            name: Laundry Light 2
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_2
+                state: unavailable
+          - type: tile
+            entity: light.laundry_light_3
+            name: Laundry Light 3
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_3
+                state: unavailable
+          - type: tile
+            entity: light.laundry_light_4
+            name: Laundry Light 4
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_4
+                state: unavailable
+          - type: tile
+            entity: light.laundry_light_5
+            name: Laundry Light 5
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_5
+                state: unavailable
+          - type: tile
+            entity: light.laundry_light_6
+            name: Laundry Light 6
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.laundry_light_6
+                state: unavailable
+          - type: tile
+            entity: light.living_room_lamp
+            name: Living Room Lamp
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.living_room_lamp
+                state: unavailable
+          - type: tile
+            entity: light.living_room_living_room_main_lights
+            features:
+              - type: light-brightness
+            features_position: bottom
+            visibility:
+              - condition: state
+                entity: light.living_room_living_room_main_lights
+                state: unavailable
+          - type: tile
+            entity: switch.great_room_great_room_main_lights_zone_2
+            visibility:
+              - condition: state
+                entity: switch.great_room_great_room_main_lights_zone_2
+                state: unavailable
+          - type: tile
+            entity: switch.night_light_socket
+            name: Night Light Socket
+            visibility:
+              - condition: state
+                entity: switch.night_light_socket
+                state: unavailable
+          - type: tile
+            entity: switch.recliners_socket
+            visibility:
+              - condition: state
+                entity: switch.recliners_socket
+                state: unavailable
+          - type: tile
+            entity: switch.record_player_socket
+            visibility:
+              - condition: state
+                entity: switch.record_player_socket
+                state: unavailable
+          - type: tile
+            entity: switch.wemo_mini
+            visibility:
+              - condition: state
+                entity: switch.wemo_mini
+                state: unavailable
+          - type: button
+            name: Turn all lights off…
+            icon: "mdi:lightbulb-group-off"
+            show_state: false
+            tap_action:
+              action: perform-action
+              perform_action: light.turn_off
+              target:
+                entity_id:
+                  - light.backyard_cam_floodlight
+                  - light.backyard_floodlight
+                  - light.basement_entry
+                  - light.bedroom_hallway_light
+                  - light.guest_room_hallway_light
+                  - light.kitchen_kitchen_island_pendants
+                  - light.kitchen_kitchen_main_lights_2
+                  - light.kitchen_kitchen_main_lights_zone1
+                  - light.laundry_light_1
+                  - light.laundry_light_2
+                  - light.laundry_light_3
+                  - light.laundry_light_4
+                  - light.laundry_light_5
+                  - light.laundry_light_6
+                  - light.living_room_lamp
+                  - light.living_room_living_room_main_lights
+              confirmation:
+                text: "Turn off all lights on this dashboard?"
+            grid_options:
+              columns: 12
+              rows: 1
+      - type: grid
+        cards:
+          - type: heading
+            heading: Media
+            heading_style: title
+            icon: "mdi:speaker-multiple"
+          - type: tile
+            entity: media_player.greatroom_display
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+          - type: tile
+            entity: media_player.home_sync
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+          - type: tile
+            entity: media_player.kitchen_display
+            name: Kitchen Display
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+          - type: tile
+            entity: media_player.master_bedroom_speaker
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+          - type: tile
+            entity: media_player.office_speaker
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+          - type: tile
+            entity: media_player.samsung_tv
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+          - type: tile
+            entity: media_player.great_room_sony_tv
+            name: "Sony TV · 4 entities, shown once"
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+              - type: media-player-source
+            features_position: bottom
+          - type: tile
+            entity: media_player.soundbar
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+      - type: grid
+        cards:
+          - type: heading
+            heading: Garage · Polestar 2
+            heading_style: title
+            icon: "mdi:car-electric"
+          - type: tile
+            entity: sensor.polestar_2_battery_charge_level
+          - type: tile
+            entity: sensor.polestar_2_range
+            name: Range
+          - type: tile
+            entity: sensor.polestar_2_charging_status
+            name: Charging Status
+          - type: tile
+            entity: sensor.polestar_2_charger_connection_status
+            name: Charger Connection Status
+          - type: tile
+            entity: sensor.polestar_2_charging_power
+            name: Charging Power
+          - type: tile
+            entity: sensor.polestar_2_estimate_full_charge_range
+            name: Estimate Full Charge Range
+          - type: tile
+            entity: sensor.polestar_2_days_to_service
+            name: Days To Service
+          - type: tile
+            entity: sensor.polestar_2_service_warning
+            name: Service Warning
+      - type: grid
+        cards:
+          - type: heading
+            heading: Office · Epson ET-2850
+            heading_style: title
+            icon: "mdi:printer"
+          - type: tile
+            entity: sensor.epson_et_2850_series
+            name: Printer status
+          - type: tile
+            entity: sensor.epson_et_2850_series_black_ink
+            name: Black ink
+          - type: tile
+            entity: sensor.epson_et_2850_series_cyan_ink
+            name: Cyan ink
+          - type: tile
+            entity: sensor.epson_et_2850_series_magenta_ink
+            name: Magenta ink
+          - type: tile
+            entity: sensor.epson_et_2850_series_yellow_ink
+            name: Yellow ink
+  - title: Rooms
+    path: rooms
+    icon: "mdi:floor-plan"
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Rooms
+            heading_style: title
+            icon: "mdi:floor-plan"
+          - type: button
+            name: Living Room
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-living-room
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Kitchen
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-kitchen
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Bedroom
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-bedroom
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Great Room
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-great-room
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Basement
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-basement
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Driveway
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-driveway
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Back Deck
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-back-deck
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Front Gate
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-front-gate
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Front Yard
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-front-yard
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Garage
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-garage
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: Office
+            icon: "mdi:door"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-office
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: button
+            name: No area yet
+            icon: "mdi:map-marker-question-outline"
+            show_state: false
+            tap_action:
+              action: navigate
+              navigation_path: /home-panel/room-unassigned
+            grid_options:
+              columns: 6
+              rows: 2
+  - title: Cameras
+    path: cameras
+    icon: "mdi:cctv"
+    type: sections
+    max_columns: 3
+    theme: Home Panel
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: markdown
+            content: |-
+              Each card shows the camera's **live state** from Home Assistant (a snapshot, or *Unavailable*). Cards marked **check name** have names that disagree with their entity ID or area; they are not renamed or moved here.
+
+              | Shown as | Entity | Area | Why it's flagged |
+              |---|---|---|---|
+              | Homesite Back Deck | `camera.front_gate_fluent` | Front Gate | Name says “Homesite Back Deck”, area is Front Gate |
+              | Driveway | `camera.homesite_back_deck_fluent` | Driveway | ID says back deck, name says “Driveway”, area is Driveway |
+              | Front Gate | `camera.homesite_driveway_fluent` | Driveway | ID says driveway, name says “Front Gate”, area is Driveway |
+              | Front Yard | `camera.front_yard_fluent` | Front Yard | Possible duplicate of camera.front_yard_fluent_2 |
+              | Front Yard | `camera.front_yard_fluent_2` | Unassigned | Possible duplicate of camera.front_yard_fluent; no area |
+      - type: grid
+        cards:
+          - type: heading
+            heading: Back Deck
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.backyard
+            name: Backyard
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Basement
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.basement_basement_cam_fluent
+            name: Basement Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Driveway
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.homesite_back_deck_fluent
+            name: Driveway · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+          - type: picture-entity
+            entity: camera.homesite_driveway_fluent
+            name: Front Gate · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Front Gate
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.front_gate_fluent
+            name: Homesite Back Deck · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Front Yard
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.front_yard_fluent
+            name: Front Yard · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Great Room
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.great_room_great_room_cam_fluent
+            name: Great Room Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Living Room
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.living_room_living_room_cam_fluent
+            name: Living Room Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: No area yet
+            heading_style: subtitle
+            icon: "mdi:map-marker"
+          - type: picture-entity
+            entity: camera.front_yard_fluent_2
+            name: Front Yard · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+  - title: Review
+    path: review
+    subview: true
+    back_path: /home-panel/home
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Needs review
+            heading_style: title
+            icon: "mdi:clipboard-check-outline"
+          - type: markdown
+            content: |-
+              Snapshot from the inventory on 2026-09-26. Nothing here changes Home Assistant.
+
+              ### Names to check
+              | Entity | Name in Home Assistant | Why |
+              |---|---|---|
+              | `camera.front_gate_fluent` | Homesite Back Deck Fluent | Name says “Homesite Back Deck”, area is Front Gate |
+              | `camera.homesite_back_deck_fluent` | Driveway | ID says back deck, name says “Driveway”, area is Driveway |
+              | `camera.homesite_driveway_fluent` | Front Gate Fluent | ID says driveway, name says “Front Gate”, area is Driveway |
+              | `camera.front_yard_fluent` | Front Yard Fluent | Possible duplicate of camera.front_yard_fluent_2 |
+              | `camera.front_yard_fluent_2` | Front Yard Fluent | Possible duplicate of camera.front_yard_fluent; no area |
+              | `binary_sensor.front_gate_motion` | Homesite Back Deck Motion | Name says “Homesite Back Deck” |
+              | `binary_sensor.front_gate_person` | Homesite Back Deck Person | Name says “Homesite Back Deck” |
+              | `binary_sensor.front_gate_vehicle` | Homesite Back Deck Vehicle | Name says “Homesite Back Deck” |
+              | `binary_sensor.homesite_back_deck_motion` | Homesite Driveway Motion | ID says back deck, name says “Homesite Driveway” |
+              | `binary_sensor.homesite_back_deck_person` | Homesite Driveway Person | ID says back deck, name says “Homesite Driveway” |
+              | `binary_sensor.homesite_back_deck_vehicle` | Homesite Driveway Vehicle | ID says back deck, name says “Homesite Driveway” |
+              | `binary_sensor.homesite_driveway_motion` | Front Gate Motion | ID says driveway, name says “Front Gate” |
+              | `binary_sensor.homesite_driveway_person` | Front Gate Person | ID says driveway, name says “Front Gate” |
+              | `binary_sensor.homesite_driveway_vehicle` | Front Gate Vehicle | ID says driveway, name says “Front Gate” |
+              | `media_player.great_room_sony_tv` | Sony Tv | Same TV also appears as media_player.sony_tv, sony_tv_2, sony_tv_3 and remote.sony_tv (hidden here) |
+              | `switch.great_room_smart_bridge_unassigned_smart_away` | Smart Bridge Unassigned Smart Away | Purpose unclear (Lutron bridge setting) |
+          - type: markdown
+            content: |-
+              ### Controls with no area
+              | Entity | Name in Home Assistant |
+              |---|---|
+              | `light.basement_entry` | Basement Entry |
+              | `light.bedroom_hallway_light` | Bedroom Hallway light |
+              | `light.guest_room_hallway_light` | Guest Room Hallway Light |
+              | `light.laundry_light_1` | Laundry light 1 |
+              | `light.laundry_light_2` | Laundry light 2 |
+              | `light.laundry_light_3` | laundry light 3 |
+              | `light.laundry_light_4` | laundry light 4 |
+              | `light.laundry_light_5` | laundry light 5 |
+              | `light.laundry_light_6` | laundry light 6 |
+              | `light.living_room_lamp` | living Room Lamp |
+              | `media_player.greatroom_display` | Greatroom Display |
+              | `media_player.home_sync` | Home Sync |
+              | `media_player.kitchen_display` | Kitchen display |
+              | `media_player.master_bedroom_speaker` | Master Bedroom Speaker |
+              | `media_player.office_speaker` | Office Speaker |
+              | `media_player.samsung_tv` | Samsung TV |
+              | `media_player.soundbar` | Soundbar |
+              | `switch.night_light_socket` | night light Socket |
+              | `switch.recliners_socket` | Recliners Socket |
+              | `switch.record_player_socket` | Record Player Socket |
+              | `switch.wemo_mini` | Wemo Mini |
+  - title: Living Room
+    path: room-living-room
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Climate and security
+            heading_style: title
+            icon: "mdi:home-thermometer"
+          - type: tile
+            entity: climate.living_room_thermostat
+            features:
+              - type: target-temperature
+              - type: climate-hvac-modes
+                style: icons
+                hvac_modes:
+                  - cool
+                  - "off"
+              - type: climate-preset-modes
+                style: dropdown
+                preset_modes:
+                  - home
+                  - away
+                  - sleep
+                  - away_indefinitely
+            features_position: bottom
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights and plugs
+            heading_style: title
+            icon: "mdi:lightbulb-group"
+          - type: tile
+            entity: light.living_room_living_room_main_lights
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: switch.roborock_q7_max_dock_dust_emptying
+            name: Roborock Q7 Max Dock Dust Emptying
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cleaning
+            heading_style: title
+            icon: "mdi:robot-vacuum"
+          - type: tile
+            entity: vacuum.living_room_vacuum
+            features:
+              - type: vacuum-commands
+                commands:
+                  - start_pause
+                  - return_home
+                  - locate
+              - type: vacuum-fan-speed
+            features_position: bottom
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.living_room_living_room_cam_fluent
+            name: Living Room Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Camera controls
+            heading_style: title
+            icon: "mdi:camera-control"
+          - type: tile
+            entity: button.living_room_living_room_cam_guard_go_to
+            name: Living Room Cam Guard Go To
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_guard_go_to
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_guard_go_to
+          - type: tile
+            entity: button.living_room_living_room_cam_ptz_down
+            name: Living Room Cam PTZ Down
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_down
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_down
+          - type: tile
+            entity: button.living_room_living_room_cam_ptz_left
+            name: Living Room Cam PTZ Left
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_left
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_left
+          - type: tile
+            entity: button.living_room_living_room_cam_ptz_right
+            name: Living Room Cam PTZ Right
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_right
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_right
+          - type: tile
+            entity: button.living_room_living_room_cam_ptz_stop
+            name: Living Room Cam PTZ Stop
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_stop
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_stop
+          - type: tile
+            entity: button.living_room_living_room_cam_ptz_up
+            name: Living Room Cam PTZ Up
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_up
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_living_room_cam_ptz_up
+          - type: tile
+            entity: button.living_room_vacuum_full_cleaning
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_vacuum_full_cleaning
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.living_room_vacuum_full_cleaning
+          - type: tile
+            entity: number.living_room_living_room_cam_focus
+          - type: tile
+            entity: number.living_room_living_room_cam_zoom
+          - type: tile
+            entity: number.living_room_thermostat_fan_minimum_on_time
+            name: Thermostat Fan Minimum On Time
+          - type: tile
+            entity: siren.living_room_living_room_cam_siren
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: perform-action
+              perform_action: siren.turn_on
+              target:
+                entity_id: siren.living_room_living_room_cam_siren
+              confirmation:
+                text: "Sound the Living Room Cam Siren?"
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.living_room_living_room_cam_animal
+          - type: tile
+            entity: binary_sensor.living_room_living_room_cam_baby_crying
+            name: Living Room Cam Baby Crying
+          - type: tile
+            entity: binary_sensor.living_room_living_room_cam_motion
+          - type: tile
+            entity: binary_sensor.living_room_living_room_cam_person
+          - type: tile
+            entity: binary_sensor.living_room_thermostat_occupancy
+          - type: tile
+            entity: sensor.living_room_thermostat_humidity
+          - type: tile
+            entity: sensor.living_room_thermostat_temperature
+          - type: tile
+            entity: sensor.living_room_vacuum_battery
+  - title: Kitchen
+    path: room-kitchen
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights and plugs
+            heading_style: title
+            icon: "mdi:lightbulb-group"
+          - type: tile
+            entity: light.kitchen_kitchen_island_pendants
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.kitchen_kitchen_main_lights_2
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.kitchen_kitchen_main_lights_zone1
+            features:
+              - type: light-brightness
+            features_position: bottom
+  - title: Bedroom
+    path: room-bedroom
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.bedroom_sensor_occupancy
+          - type: tile
+            entity: sensor.bedroom_sensor_temperature
+  - title: Great Room
+    path: room-great-room
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Climate and security
+            heading_style: title
+            icon: "mdi:home-thermometer"
+          - type: tile
+            entity: climate.great_room_thermostat
+            features:
+              - type: target-temperature
+              - type: climate-hvac-modes
+                style: icons
+                hvac_modes:
+                  - heat
+                  - "off"
+              - type: climate-preset-modes
+                style: dropdown
+                preset_modes:
+                  - away
+                  - home
+                  - sleep
+                  - away_indefinitely
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: lock.front_door
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights and plugs
+            heading_style: title
+            icon: "mdi:lightbulb-group"
+          - type: tile
+            entity: switch.great_room_great_room_main_lights_zone_2
+          - type: tile
+            entity: switch.great_room_smart_bridge_unassigned_smart_away
+      - type: grid
+        cards:
+          - type: heading
+            heading: Media
+            heading_style: title
+            icon: "mdi:speaker"
+          - type: tile
+            entity: media_player.great_room_sony_tv
+            name: Sony TV
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+              - type: media-player-source
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: remote.great_room_sony_tv
+            name: Sony TV
+            icon_tap_action:
+              action: more-info
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.great_room_great_room_cam_fluent
+            name: Great Room Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Camera controls
+            heading_style: title
+            icon: "mdi:camera-control"
+          - type: tile
+            entity: button.great_room_great_room_cam_guard_go_to
+            name: Great Room Cam Guard Go To
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_guard_go_to
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_guard_go_to
+          - type: tile
+            entity: button.great_room_great_room_cam_ptz_down
+            name: Great Room Cam PTZ Down
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_down
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_down
+          - type: tile
+            entity: button.great_room_great_room_cam_ptz_left
+            name: Great Room Cam PTZ Left
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_left
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_left
+          - type: tile
+            entity: button.great_room_great_room_cam_ptz_right
+            name: Great Room Cam PTZ Right
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_right
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_right
+          - type: tile
+            entity: button.great_room_great_room_cam_ptz_stop
+            name: Great Room Cam PTZ Stop
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_stop
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_stop
+          - type: tile
+            entity: button.great_room_great_room_cam_ptz_up
+            name: Great Room Cam PTZ Up
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_up
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.great_room_great_room_cam_ptz_up
+          - type: tile
+            entity: number.great_room_thermostat_fan_minimum_on_time
+            name: Thermostat Fan Minimum On Time
+          - type: tile
+            entity: siren.great_room_great_room_cam_siren
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: perform-action
+              perform_action: siren.turn_on
+              target:
+                entity_id: siren.great_room_great_room_cam_siren
+              confirmation:
+                text: "Sound the Great Room Cam Siren?"
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.front_door_door
+          - type: tile
+            entity: binary_sensor.great_room_great_room_cam_animal
+          - type: tile
+            entity: binary_sensor.great_room_great_room_cam_baby_crying
+            name: Great Room Cam Baby Crying
+          - type: tile
+            entity: binary_sensor.great_room_great_room_cam_motion
+          - type: tile
+            entity: binary_sensor.great_room_great_room_cam_person
+          - type: tile
+            entity: sensor.front_door_battery
+          - type: tile
+            entity: sensor.front_door_last_access
+          - type: tile
+            entity: sensor.great_room_thermostat_humidity
+            name: Thermostat Humidity
+          - type: tile
+            entity: sensor.great_room_thermostat_temperature
+            name: Thermostat Temperature
+  - title: Basement
+    path: room-basement
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.basement_basement_cam_fluent
+            name: Basement Cam
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Camera controls
+            heading_style: title
+            icon: "mdi:camera-control"
+          - type: tile
+            entity: button.basement_basement_cam_guard_go_to
+            name: Basement Cam Guard Go To
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_guard_go_to
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_guard_go_to
+          - type: tile
+            entity: button.basement_basement_cam_ptz_down
+            name: Basement Cam PTZ Down
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_down
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_down
+          - type: tile
+            entity: button.basement_basement_cam_ptz_left
+            name: Basement Cam PTZ Left
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_left
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_left
+          - type: tile
+            entity: button.basement_basement_cam_ptz_right
+            name: Basement Cam PTZ Right
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_right
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_right
+          - type: tile
+            entity: button.basement_basement_cam_ptz_stop
+            name: Basement Cam PTZ Stop
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_stop
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_stop
+          - type: tile
+            entity: button.basement_basement_cam_ptz_up
+            name: Basement Cam PTZ Up
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_up
+            icon_tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.basement_basement_cam_ptz_up
+          - type: tile
+            entity: siren.basement_basement_cam_siren
+            tap_action:
+              action: more-info
+            icon_tap_action:
+              action: perform-action
+              perform_action: siren.turn_on
+              target:
+                entity_id: siren.basement_basement_cam_siren
+              confirmation:
+                text: "Sound the Basement Cam Siren?"
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.basement_basement_cam_animal
+          - type: tile
+            entity: binary_sensor.basement_basement_cam_baby_crying
+            name: Basement Cam Baby Crying
+          - type: tile
+            entity: binary_sensor.basement_basement_cam_motion
+          - type: tile
+            entity: binary_sensor.basement_basement_cam_person
+  - title: Driveway
+    path: room-driveway
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.homesite_back_deck_fluent
+            name: Driveway · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+          - type: picture-entity
+            entity: camera.homesite_driveway_fluent
+            name: Front Gate · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.homesite_driveway_motion
+          - type: tile
+            entity: binary_sensor.homesite_driveway_person
+          - type: tile
+            entity: binary_sensor.homesite_driveway_vehicle
+          - type: tile
+            entity: binary_sensor.homesite_back_deck_motion
+          - type: tile
+            entity: binary_sensor.homesite_back_deck_person
+          - type: tile
+            entity: binary_sensor.homesite_back_deck_vehicle
+  - title: Back Deck
+    path: room-back-deck
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights and plugs
+            heading_style: title
+            icon: "mdi:lightbulb-group"
+          - type: tile
+            entity: light.backyard_cam_floodlight
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.backyard_floodlight
+            features:
+              - type: light-brightness
+            features_position: bottom
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.backyard
+            name: Backyard
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+  - title: Front Gate
+    path: room-front-gate
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.front_gate_fluent
+            name: Homesite Back Deck · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.front_gate_motion
+          - type: tile
+            entity: binary_sensor.front_gate_person
+          - type: tile
+            entity: binary_sensor.front_gate_vehicle
+  - title: Front Yard
+    path: room-front-yard
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.front_yard_fluent
+            name: Front Yard · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.front_yard_motion
+          - type: tile
+            entity: binary_sensor.front_yard_person
+          - type: tile
+            entity: binary_sensor.front_yard_vehicle
+  - title: Garage
+    path: room-garage
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: sensor.polestar_2
+          - type: tile
+            entity: sensor.polestar_2_average_energy_consumption
+          - type: tile
+            entity: sensor.polestar_2_average_speed
+          - type: tile
+            entity: sensor.polestar_2_brake_fluid_level_warning
+          - type: tile
+            entity: sensor.polestar_2_charger_connection_status
+          - type: tile
+            entity: sensor.polestar_2_charging_current
+          - type: tile
+            entity: sensor.polestar_2_charging_power
+          - type: tile
+            entity: sensor.polestar_2_charging_status
+          - type: tile
+            entity: sensor.polestar_2_charging_target_level
+          - type: tile
+            entity: sensor.polestar_2_charging_target_setting_type
+          - type: tile
+            entity: sensor.polestar_2_charging_time
+          - type: tile
+            entity: sensor.polestar_2_days_to_service
+            name: Polestar 2 Days To Service
+          - type: tile
+            entity: sensor.polestar_2_distance_to_service
+            name: Polestar 2 Distance To Service
+          - type: tile
+            entity: sensor.polestar_2_engine_coolant_level_warning
+          - type: tile
+            entity: sensor.polestar_2_estimate_full_charge_range
+          - type: tile
+            entity: sensor.polestar_2_estimated_charging_time_to_target_distance
+            name: Polestar 2 Estimated Charging Time To Target Distance
+          - type: tile
+            entity: sensor.polestar_2_estimated_fully_charged_time
+          - type: tile
+            entity: sensor.polestar_2_model_name
+          - type: tile
+            entity: sensor.polestar_2_model_year
+          - type: tile
+            entity: sensor.polestar_2_odometer
+          - type: tile
+            entity: sensor.polestar_2_oil_level_warning
+          - type: tile
+            entity: sensor.polestar_2_range
+          - type: tile
+            entity: sensor.polestar_2_service_warning
+          - type: tile
+            entity: sensor.polestar_2_trip_meter_automatic
+          - type: tile
+            entity: sensor.polestar_2_trip_meter_manual
+          - type: tile
+            entity: sensor.polestar_2_voltage
+          - type: tile
+            entity: sensor.polestar_2_battery_charge_level
+  - title: Office
+    path: room-office
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: sensor.epson_et_2850_series
+          - type: tile
+            entity: sensor.epson_et_2850_series_black_ink
+            name: EPSON ET-2850 Series Black Ink
+          - type: tile
+            entity: sensor.epson_et_2850_series_cyan_ink
+            name: EPSON ET-2850 Series Cyan Ink
+          - type: tile
+            entity: sensor.epson_et_2850_series_magenta_ink
+            name: EPSON ET-2850 Series Magenta Ink
+          - type: tile
+            entity: sensor.epson_et_2850_series_yellow_ink
+            name: EPSON ET-2850 Series Yellow Ink
+  - title: No area yet
+    path: room-unassigned
+    subview: true
+    back_path: /home-panel/rooms
+    type: sections
+    max_columns: 2
+    theme: Home Panel
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: markdown
+            content: "These entities have **no area** in Home Assistant. They are listed as found; assign areas in Home Assistant and they will move to their rooms."
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights and plugs
+            heading_style: title
+            icon: "mdi:lightbulb-group"
+          - type: tile
+            entity: light.basement_entry
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.bedroom_hallway_light
+            name: Bedroom Hallway Light
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.guest_room_hallway_light
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.laundry_light_1
+            name: Laundry Light 1
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.laundry_light_2
+            name: Laundry Light 2
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.laundry_light_3
+            name: Laundry Light 3
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.laundry_light_4
+            name: Laundry Light 4
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.laundry_light_5
+            name: Laundry Light 5
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.laundry_light_6
+            name: Laundry Light 6
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: light.living_room_lamp
+            name: Living Room Lamp
+            features:
+              - type: light-brightness
+            features_position: bottom
+          - type: tile
+            entity: switch.night_light_socket
+            name: Night Light Socket
+          - type: tile
+            entity: switch.recliners_socket
+          - type: tile
+            entity: switch.record_player_socket
+          - type: tile
+            entity: switch.wemo_mini
+      - type: grid
+        cards:
+          - type: heading
+            heading: Media
+            heading_style: title
+            icon: "mdi:speaker"
+          - type: tile
+            entity: media_player.greatroom_display
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: media_player.home_sync
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: media_player.kitchen_display
+            name: Kitchen Display
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: media_player.master_bedroom_speaker
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: media_player.office_speaker
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: media_player.samsung_tv
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+          - type: tile
+            entity: media_player.soundbar
+            features:
+              - type: media-player-playback
+                controls:
+                  - media_play_pause
+              - type: media-player-volume-slider
+            features_position: bottom
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cameras
+            heading_style: title
+            icon: "mdi:cctv"
+          - type: picture-entity
+            entity: camera.front_yard_fluent_2
+            name: Front Yard · check name
+            camera_view: auto
+            show_name: true
+            show_state: true
+            fit_mode: cover
+            aspect_ratio: "16:9"
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: 12
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensors
+            heading_style: title
+            icon: "mdi:gauge"
+          - type: tile
+            entity: binary_sensor.front_yard_animal
+          - type: tile
+            entity: binary_sensor.front_yard_motion_2
+          - type: tile
+            entity: binary_sensor.front_yard_person_2
+          - type: tile
+            entity: binary_sensor.front_yard_vehicle_2
+          - type: tile
+            entity: sun.sun
+          - type: tile
+            entity: weather.forecast_home

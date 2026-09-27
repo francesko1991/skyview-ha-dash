@@ -1,0 +1,29 @@
+alias: Outfit advice - keep fresh
+description: >-
+  Refreshes the what-to-wear advice 45 minutes before work departure on weekdays, at 7:30
+  on weekends, and when the weather condition changes (at most once an hour, 5:30-22:00).
+mode: single
+triggers:
+  - trigger: time
+    at: "07:30:00"
+    id: weekend_morning
+  - trigger: template
+    value_template: >-
+      {{ has_value('input_datetime.work_departure') and now().weekday() < 5 and
+         now() >= today_at(states('input_datetime.work_departure')) - timedelta(minutes=45) }}
+    id: before_work
+  - trigger: state
+    entity_id: weather.forecast_home
+    for: "00:15:00"
+    id: weather_changed
+conditions:
+  - condition: time
+    after: "05:30:00"
+    before: "22:00:00"
+  - condition: template
+    value_template: >-
+      {{ (trigger.id == 'weekend_morning' and now().weekday() >= 5) or trigger.id == 'before_work' or
+         (trigger.id == 'weather_changed' and
+         now().timestamp() - (state_attr('input_datetime.outfit_updated', 'timestamp') or 0) > 3600) }}
+actions:
+  - action: script.refresh_weather_clothing_advice

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#D6E2F2"/><stop offset=".5" stop-color="#E9EFF7"/>
+<stop offset=".85" stop-color="#F3EFEA"/><stop offset="1" stop-color="#F6EADB"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy="1" r=".7" fx=".5" fy="1">
+<stop offset="0" stop-color="#F4D9A8" stop-opacity=".55"/><stop offset="1" stop-color="#F4D9A8" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="1000" fill="url(#sky)"/>
+<rect width="1600" height="1000" fill="url(#glow)"/>
+<path d="M-50,1000 L-50,905 C65,905 65,880 180,880 C300,880 300,892 420,892 C530,892 530,868 640,868 C760,868 760,884 880,884 C1000,884 1000,860 1120,860 C1240,860 1240,878 1360,878 C1505,878 1505,866 1650,866 L1650,1000Z" fill="#DCE3EC"/>
+<path d="M-50,1000 L-50,950 C105,950 105,928 260,928 C400,928 400,944 540,944 C680,944 680,922 820,922 C960,922 960,940 1100,940 C1240,940 1240,926 1380,926 C1515,926 1515,938 1650,938 L1650,1000Z" fill="#CFD8E4"/>
+</svg>

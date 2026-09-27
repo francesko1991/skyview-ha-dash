@@ -1,0 +1,508 @@
+<title>Home Panel Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+<style>
+/* Home Panel theme v2 tokens: Morning sky (light) on :root, Twilight sky (dark) below. Same values as themes/home_panel.yaml. */
+:root{
+  --ground:#EEF2F8; --surface:rgba(255,255,255,.82); --surface-2:#E6ECF4; --line:rgba(40,60,100,.12);
+  --ink:#16213A; --muted:#5D6A84; --gold:#A8843F; --sky:#2F6FA8; --ok:#3F7D5C; --warn:#9A6A00; --bad:#B3473C;
+  --purple:#7E57C2;
+  --shadow:0 1px 2px rgba(22,33,58,.06),0 8px 24px rgba(22,33,58,.08);
+  --bar:#FFFFFF; --bar-ink:#16213A;
+  --bg:url("__MORNING__");
+  --r:16px;
+  --font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --ground:#0B1222; --surface:rgba(19,28,48,.86); --surface-2:#1B2640; --line:rgba(160,180,220,.16);
+  --ink:#E9EEF7; --muted:#93A0BA; --gold:#D9BE86; --sky:#8FC3EE; --ok:#8CCBA8; --warn:#E8C07A; --bad:#E99A92;
+  --purple:#B39DDB;
+  --shadow:0 1px 2px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.18);
+  --bar:#1C1C1E; --bar-ink:#E9EEF7;
+  --bg:url("__TWILIGHT__");
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0B1222; --surface:rgba(19,28,48,.86); --surface-2:#1B2640; --line:rgba(160,180,220,.16);
+  --ink:#E9EEF7; --muted:#93A0BA; --gold:#D9BE86; --sky:#8FC3EE; --ok:#8CCBA8; --warn:#E8C07A; --bad:#E99A92;
+  --purple:#B39DDB;
+  --shadow:0 1px 2px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.18);
+  --bar:#1C1C1E; --bar-ink:#E9EEF7;
+  --bg:url("__TWILIGHT__");
+}
+*{box-sizing:border-box}
+html{background:var(--ground)}
+body{margin:0;color:var(--ink);font:15px/1.4 var(--font);background:var(--ground) var(--bg) center/cover no-repeat fixed;min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:22px;line-height:1;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings:"liga";font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24;user-select:none}
+.ms.o{font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
+
+/* app bar (as in the Home Assistant app) */
+.bar{position:sticky;top:0;z-index:5;background:var(--bar);color:var(--bar-ink);display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 0;border-bottom:1px solid var(--line)}
+.bar .tabs{display:flex;flex:1;gap:4px}
+.bar .tab{display:flex;align-items:center;justify-content:center;width:64px;height:48px;border-bottom:3px solid transparent;color:var(--muted)}
+.bar .tab[aria-current="page"]{color:var(--bar-ink);border-bottom-color:var(--bar-ink)}
+.bar .title{flex:1;font-size:21px;padding-left:10px}
+.bar .icon{width:44px;height:48px;display:flex;align-items:center;justify-content:center}
+.proto-tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:3px 9px;white-space:nowrap}
+
+main{max-width:1180px;margin:0 auto;padding:16px 16px 48px}
+.sections{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
+@media (min-width:860px){.sections{grid-template-columns:repeat(2,minmax(0,1fr))}.span-all{grid-column:1/-1}}
+.sec{min-width:0}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.stack{display:flex;flex-direction:column;gap:8px}
+.heading{display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 2px}
+.heading h2{font-size:21px;font-weight:400;margin:0;flex:1;text-wrap:balance}
+.heading .ms{font-size:24px}
+.badges{display:flex;gap:14px;align-items:center;color:var(--muted);font-size:14px;flex-wrap:wrap;justify-content:flex-end}
+.badge{display:inline-flex;align-items:center;gap:4px}
+.badge .ms{font-size:18px}
+.badge.btn{padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+
+/* Mushroom-style template card */
+.tcard{display:flex;align-items:center;gap:12px;padding:12px}
+.tcard.vert{flex-direction:column;justify-content:center;text-align:center;gap:8px;padding:14px 8px}
+.shape{position:relative;flex:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--c,var(--muted));background:color-mix(in srgb,var(--c,var(--muted)) 20%,transparent)}
+.shape.lg{width:52px;height:52px}.shape.lg .ms{font-size:28px}
+.shape .bdg{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bc,var(--warn));color:var(--ground)}
+.shape .bdg .ms{font-size:13px}
+.t-prim{font-weight:500;font-size:15px}
+.t-sec{color:var(--muted);font-size:14px;white-space:pre-line}
+.tcard .txt{min-width:0}
+.tcard .txt .t-prim,.tcard:not(.vert) .t-sec{overflow:hidden;text-overflow:ellipsis}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips.center{justify-content:center}
+.chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:500;white-space:nowrap}
+.chip .ms{font-size:18px;color:var(--ic,var(--ink))}
+.chip.dim{opacity:.72}
+
+/* panels (glass boxes with an uppercase label) */
+.panel{padding:12px 10px}
+.panel .lbl{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
+/* header */
+.clockrow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:4px 4px 0}
+.clock{font-size:46px;font-weight:500;line-height:.9;font-variant-numeric:tabular-nums}
+.clock small{font-size:17px;opacity:.6;margin-left:6px;font-weight:500}
+.date{text-align:right;padding-bottom:2px}
+.date .wd{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.65}
+.date .dm{font-size:19px;opacity:.9}
+.shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,108px));justify-content:center;gap:14px}
+.pill{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 6px 18px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 30%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 16%,transparent),transparent 70%),var(--surface);box-shadow:var(--shadow)}
+.pill .t-sec{font-size:13px}
+
+/* tiles */
+.tile{display:flex;align-items:center;gap:12px;padding:12px}
+.tile.vert{flex-direction:column;justify-content:center;text-align:center;gap:6px;height:120px}
+.row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+.row3 > *{height:120px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
+/* swipe */
+.swipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;scrollbar-width:none;overscroll-behavior-x:contain;align-items:flex-start}
+.swipe::-webkit-scrollbar{display:none}
+.swipe > .page{flex:0 0 100%;min-width:0;scroll-snap-align:start}
+.dots{display:flex;justify-content:center;gap:10px;padding:6px 0 0}
+.dots button{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--muted)}
+.dots button[aria-current="true"]{background:var(--muted)}
+
+/* bars */
+.gauge{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin-top:8px}
+.gauge i{display:block;height:100%;border-radius:inherit;background:var(--c,var(--sky))}
+
+/* cameras */
+.cams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:860px){.cams{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cam{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:linear-gradient(160deg,#2a3346,#11172a);color:#fff;display:flex;align-items:flex-end;justify-content:center}
+.cam .ms.bg{position:absolute;inset:0;margin:auto;height:fit-content;width:fit-content;font-size:34px;opacity:.28}
+.cam .nm{position:relative;width:100%;padding:10px 12px;background:linear-gradient(0deg,rgba(0,0,0,.55),transparent);font-size:16px;text-align:center}
+.cam .on{position:absolute;right:12px;bottom:12px;width:12px;height:12px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(0,0,0,.45)}
+.cam.iota{background:linear-gradient(160deg,#3a3246,#17132a)}
+
+/* map + deck */
+.map{height:230px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.deck{padding:12px;display:flex;flex-direction:column;gap:12px}
+.deck .btns{display:grid;gap:8px}
+.dbtn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:18px;background:color-mix(in srgb,var(--ink) 6%,transparent);font-weight:500}
+.dbtn .shape{width:40px;height:40px}
+
+/* dials (simplified thermostat) */
+.dial{padding:12px 10px 10px;text-align:center;border:1px solid color-mix(in srgb,var(--c) 30%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 14%,transparent),transparent 60%),var(--surface)}
+.dial svg{width:100%;max-width:170px;display:block;margin:4px auto 0}
+.dial .big{font-size:30px;font-weight:400}
+.seg{display:grid;grid-auto-flow:column;gap:0;margin-top:8px;border-radius:12px;background:var(--surface-2);overflow:hidden}
+.seg button{padding:9px 0;display:flex;justify-content:center}
+.seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--ink) 20%,transparent)}
+.seg button.heat[aria-pressed="true"]{background:color-mix(in srgb,var(--warn) 45%,transparent)}
+.seg button.cool[aria-pressed="true"]{background:color-mix(in srgb,var(--sky) 45%,transparent)}
+
+/* dialog + toast */
+.scrim{position:fixed;inset:0;background:rgba(5,8,18,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.dialog{max-width:360px;width:100%;padding:20px;background:var(--ground);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.dialog p{margin:0 0 18px}
+.dialog .acts{display:flex;justify-content:flex-end;gap:8px}
+.dialog .acts button{padding:9px 16px;border-radius:999px;font-weight:500}
+.dialog .acts .go{background:var(--gold);color:var(--ground)}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.note{color:var(--muted);font-size:13px;text-align:center;margin:18px 0 0}
+</style>
+
+<header class="bar" id="bar"></header>
+<main id="main"></main>
+<div id="layer"></div>
+
+<script>
+/* Prototype of the live "Home Panel" dashboard (2026-09-27). Demo values only: no live data, camera images,
+   addresses or names. Taps change local demo state so the flows can be tried. */
+const $ = s => document.querySelector(s);
+const ico = (n, cls = "") => `<span class="ms ${cls}" aria-hidden="true">${n}</span>`;
+const shape = (icon, color, { lg = false, badge = null, bc = null, outline = false } = {}) =>
+  `<span class="shape ${lg ? "lg" : ""}" style="--c:${color}">${ico(icon, outline ? "o" : "")}${badge ? `<span class="bdg" style="--bc:${bc || "var(--warn)"}">${ico(badge)}</span>` : ""}</span>`;
+const chip = (label, icon, { ic = "", act = "", dim = false, outline = false } = {}) =>
+  `<button class="chip ${dim ? "dim" : ""}" ${act ? `data-act="${act}"` : ""} style="${ic ? `--ic:${ic}` : ""}">${ico(icon, outline ? "o" : "")}${label ? `<span>${label}</span>` : ""}</button>`;
+const tcard = (icon, color, prim, sec, { act = "", vert = false, badge = null, bc = null, lg = false, extra = "" } = {}) =>
+  `<button class="card tcard ${vert ? "vert" : ""}" ${act ? `data-act="${act}"` : ""} style="width:100%;text-align:${vert ? "center" : "left"}">${shape(icon, color, { badge, bc, lg })}<span class="txt"><div class="t-prim">${prim}</div>${sec ? `<div class="t-sec">${sec}</div>` : ""}</span>${extra}</button>`;
+const panel = (label, inner) => `<div class="card panel"><div class="lbl">${label}</div>${inner}</div>`;
+const heading = (icon, title, badges = "") => `<div class="heading">${ico(icon)}<h2>${title}</h2><div class="badges">${badges}</div></div>`;
+const badge = (icon, text, color = "") => `<span class="badge" style="${color ? `color:${color}` : ""}">${ico(icon)}${text}</span>`;
+
+/* ---------------- demo state ---------------- */
+const S = {
+  view: "home",
+  lights: {
+    island: { name: "Island", on: false, room: "Kitchen" }, c1: { name: "Ceiling 1", on: false, room: "Kitchen" },
+    c2: { name: "Ceiling 2", on: false, room: "Kitchen" }, living: { name: "Living Room", on: false, room: "Living" },
+    great: { name: "Great Room", on: false, room: "Living", sw: true }, fire: { name: "Fireplace", on: true, room: "Living", sw: true, icon: "fireplace" },
+    flood: { name: "Floodlight", on: false, room: "Outdoor" },
+  },
+  laundryOn: 0, presence: { kitchen: false, basement: false },
+  alarm: "disarmed", lock: "locked", doorOpen: false,
+  climate: { gr: { mode: "off", preset: "home", cur: 68.7, hum: 64 }, lr: { mode: "off", preset: "sleep", cur: 68.9, hum: 59 } },
+  vac: { state: "docked", map: "Downstairs", mode: "Vacuum", suction: "Balanced" },
+  mower: { state: "docked", battery: 100, blades: 12 },
+  outfit: { thinking: false, shownAt: Date.now() },
+  media: { playing: true },
+};
+const ROOMS = { Upstairs: ["Living Room", "Kitchen", "Office", "Master Bedroom", "Bathroom", "New Bathroom", "Hallway", "Corridor"], Downstairs: ["Great Room"] };
+
+/* ---------------- header ---------------- */
+function viewHeader() {
+  const now = new Date();
+  const h = now.getHours(), greet = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).replace(/\s?(AM|PM)/i, "");
+  const ampm = now.getHours() < 12 ? "AM" : "PM";
+  const on = Object.values(S.lights).filter(l => l.on).length + (S.laundryOn ? 1 : 0);
+  const outfitVisible = S.outfit.thinking === false && Date.now() - S.outfit.shownAt < 5 * 60 * 1000;
+  return `<section class="sec span-all stack">
+    <div class="clockrow"><div class="clock">${time}<small>${ampm}</small></div>
+      <div class="date"><div class="wd">${now.toLocaleDateString([], { weekday: "long" })}</div><div class="dm">${now.toLocaleDateString([], { month: "long", day: "numeric" })}</div></div></div>
+    <div class="shortcuts">
+      <button class="pill" style="--c:var(--sky)" data-act="go:climate">${shape("thermostat", "var(--sky)", { lg: true })}<div class="t-prim">Climate</div><div class="t-sec">69° inside</div></button>
+      <button class="pill" style="--c:var(--gold)" data-act="go:lights">${shape("lightbulb", "var(--gold)", { lg: true })}<div class="t-prim">Lights</div><div class="t-sec">${on ? on + " on" : "All off"}</div></button>
+      <button class="pill" style="--c:var(--purple)" data-act="go:media">${shape("play_circle", "var(--purple)", { lg: true })}<div class="t-prim">Media</div><div class="t-sec">${S.media.playing ? "1 playing" : "Nothing on"}</div></button>
+    </div>
+    <div class="chips center">
+      ${chip("Rainy · 55 °F", "rainy", { ic: "var(--sky)" })}
+      ${chip(S.outfit.thinking ? "Thinking…" : "Rain jacket", S.outfit.thinking ? "progress_activity" : "umbrella", { ic: "var(--gold)", act: "outfit" })}
+      ${chip("Lock: " + (S.lock === "locked" ? "Locked" : "Unlocked"), S.lock === "locked" ? "lock" : "lock_open", { ic: S.lock === "locked" ? "var(--muted)" : "var(--bad)" })}
+      ${chip("All 9 cameras online", "videocam", { ic: "var(--muted)" })}
+      ${chip("3 lights/plugs offline", "lightbulb", { ic: "var(--warn)", outline: true })}
+      ${chip("Setup · 8 items", "tune", { ic: "var(--muted)" })}
+    </div>
+    ${outfitVisible ? tcard("umbrella", "var(--gold)", `${greet} · what to wear`,
+      "Rain jacket and layers for 55°F; wind gusts up to 25 mph this evening.\nUpdated just now · Rainy 55°F · shows for 5 minutes", { act: "outfit" }) : ""}
+  </section>`;
+}
+
+/* ---------------- Security | Climate ---------------- */
+function alarmColor(a) { return a === "triggered" ? "var(--bad)" : a.startsWith("armed") ? "var(--ok)" : "var(--muted)"; }
+function alarmIcon(a) { return a === "disarmed" ? "remove_moderator" : a === "armed_home" ? "shield_with_house" : "gpp_good"; }
+function pageSecurity() {
+  const a = S.alarm, names = { disarmed: "Disarmed", armed_home: "Armed home", armed_away: "Armed away" };
+  const mode = (label, icon, st) => chip(label, icon, { ic: a === st ? "var(--gold)" : "var(--muted)", act: "alarm:" + st });
+  return `<div class="page stack">
+    ${heading("shield", "Security", badge("sensor_door", S.doorOpen ? "Open" : "Closed") + badge("battery_full", "100%"))}
+    ${tcard(alarmIcon(a), alarmColor(a), "Alarm · " + names[a], `Door/window ${S.doorOpen ? "open" : "closed"} · motion clear`, { act: "info:Opens the full alarm dialog in Home Assistant" })}
+    <div class="chips center">${mode("Home", "shield_with_house", "armed_home")}${mode("Away", "gpp_good", "armed_away")}${mode("Off", "remove_moderator", "disarmed")}</div>
+    <div class="row3">
+      <button class="card tile vert" data-act="lock">${shape(S.lock === "locked" ? "lock" : "lock_open", S.lock === "locked" ? "var(--ok)" : "var(--bad)")}<div class="t-prim">Front Door</div><div class="t-sec">${S.lock === "locked" ? "Locked" : "Unlocked"} · 6 hours ago</div></button>
+      ${tcard("blinds", "var(--sky)", "Open", "Blinds", { vert: true, act: "toast:Blinds opening (Tuya scene)" })}
+      ${tcard("blinds_closed", "var(--sky)", "Close", "Blinds", { vert: true, act: "toast:Blinds closing (Tuya scene)" })}
+    </div>
+    ${dots("sec", 0, 2)}
+  </div>`;
+}
+function thermoMini(k, name) {
+  const c = S.climate[k], act = c.mode === "heat" ? "heating" : c.mode === "cool" ? "cooling" : "";
+  const color = act === "heating" ? "var(--warn)" : act === "cooling" ? "var(--sky)" : "var(--muted)";
+  return tcard("thermostat", color, name, `${c.cur}° · ${c.mode === "off" ? "Off" : "→ 70°"} · ${c.hum}%`,
+    { vert: true, badge: act ? (act === "heating" ? "local_fire_department" : "ac_unit") : null, bc: color, act: "go:climate" });
+}
+function pageClimateMini() {
+  return `<div class="page stack">
+    ${heading("thermostat", "Climate", badge("bed", "67.7 °F") + badge("weekend", "70.1 °F"))}
+    <div class="row2" style="grid-auto-rows:120px">${thermoMini("gr", "Great Room")}${thermoMini("lr", "Living Room")}</div>
+    ${dots("sec", 1, 2)}
+  </div>`;
+}
+
+/* ---------------- Garage | Lights ---------------- */
+function pageGarage() {
+  const b = 78;
+  const small = (icon, color, p, s) => `<div class="card tile">${shape(icon, color)}<div><div class="t-prim">${p}</div><div class="t-sec">${s}</div></div></div>`;
+  return `<div class="page stack">
+    ${heading("electric_car", "Garage · Polestar 2", badge("power", "Plugged in", "var(--ok)") + badge("build", "143 d"))}
+    <div class="card tcard" style="display:block">
+      <div style="display:flex;gap:12px;align-items:center">${shape("battery_5_bar", "var(--gold)")}<div><div class="t-prim">Battery</div><div class="t-sec">${b}% · 204 mi range · full: 262 mi</div></div></div>
+      <div class="gauge" style="--c:var(--gold)"><i style="width:${b}%"></i></div>
+    </div>
+    <div class="row2">${small("ev_station", "var(--muted)", "Status", "Idle")}${small("bolt", "var(--muted)", "Power", "0 kW")}${small("speed", "var(--muted)", "Odometer", "18,420 mi")}${small("build", "var(--muted)", "Next service", "143 days")}</div>
+    <div class="row2">${small("warning", "var(--ok)", "Service warning", "None")}${small("water_drop", "var(--ok)", "Brake fluid", "OK")}${small("thermostat", "var(--ok)", "Coolant", "OK")}${small("oil_barrel", "var(--ok)", "Oil", "OK")}</div>
+    ${dots("gar", 0, 2)}
+  </div>`;
+}
+function lightChip(key) {
+  const l = S.lights[key];
+  return chip(l.name + (l.on && !l.sw ? " · 10%" : ""), l.icon || "lightbulb", { ic: l.on ? "var(--gold)" : "var(--muted)", act: "light:" + key, outline: !l.on });
+}
+const presenceChip = room => chip(S.presence[room] ? "Occupied" : "Clear", "person", { ic: S.presence[room] ? "var(--gold)" : "var(--muted)", act: "presence:" + room, outline: !S.presence[room] });
+function lightsBody() {
+  const on = Object.values(S.lights).filter(l => l.on);
+  return `${tcard("emoji_objects", on.length ? "var(--gold)" : "var(--muted)", on.length ? on.length + " on" : "All off", (on.map(l => l.name).join(", ") || "Everything is off") + " · 3 offline")}
+    <div class="pgrid">
+      ${panel("Kitchen", `<div class="chips">${presenceChip("kitchen")}${lightChip("island")}${lightChip("c1")}${lightChip("c2")}</div>`)}
+      ${panel("Living & Great Room", `<div class="chips">${lightChip("living")}${lightChip("great")}${lightChip("fire")}</div>`)}
+      ${panel("Outdoor", `<div class="chips">${lightChip("flood")}</div>`)}
+      ${panel("Basement & laundry", `<div class="chips">${presenceChip("basement")}${chip(S.laundryOn ? S.laundryOn + " of 6 on" : "Off", "light_group", { ic: S.laundryOn ? "var(--gold)" : "var(--muted)", act: "laundry" })}</div>`)}
+    </div>`;
+}
+function pageLights() {
+  return `<div class="page stack">
+    ${heading("light_group", "Lights & plugs", `<button class="badge btn" data-act="alloff">${ico("flashlight_off")}All off</button>`)}
+    ${lightsBody()}
+    ${dots("gar", 1, 2)}
+  </div>`;
+}
+
+/* ---------------- Cameras ---------------- */
+const CAMS = ["Driveway", "Back Deck", "Backyard", "Basement Cam", "Great Room Cam", "Living Room Cam", "Front Yard", "Front Gate", "Great Room · Iota"];
+function camerasSection(all = false) {
+  return `<section class="sec span-all stack">
+    ${heading("videocam", "Cameras", all ? "" : `<button class="badge btn" data-act="tab:cameras">${ico("arrow_forward")}All cameras</button>`)}
+    <div class="cams">${CAMS.map(n => `<button class="cam ${n.includes("Iota") ? "iota" : ""}" data-act="toast:${n} — live view opens here (no image in the prototype)">${ico("videocam", "bg")}<span class="nm">${n}</span><span class="on"></span></button>`).join("")}</div>
+  </section>`;
+}
+
+/* ---------------- Cleaning | Mower | Media ---------------- */
+function mapSvg() {
+  return `<svg viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="Illustrative floor map">
+    <rect x="70" y="40" width="60" height="110" rx="4" fill="#E8A86B" opacity=".85"/><rect x="130" y="40" width="60" height="45" rx="4" fill="#A56CC1" opacity=".85"/>
+    <rect x="130" y="85" width="90" height="45" rx="4" fill="#8FC3EE" opacity=".85"/><rect x="190" y="40" width="55" height="45" rx="4" fill="#5CCB8A" opacity=".85"/>
+    <rect x="220" y="85" width="30" height="25" rx="3" fill="#F0A020" opacity=".85"/><rect x="220" y="110" width="30" height="40" rx="3" fill="#3A8FD8" opacity=".85"/>
+    <circle cx="140" cy="95" r="5" fill="#fff"/><text x="160" y="186" text-anchor="middle" font-size="11" fill="currentColor" opacity=".6">Illustrative map</text></svg>`;
+}
+function pageCleaning() {
+  const v = S.vac, cleaning = v.state === "cleaning";
+  const btn = (l, i, c, act) => `<button class="dbtn" data-act="${act}">${shape(i, c)}<span>${l}</span></button>`;
+  const roomPanel = (map) => {
+    const here = v.map === map;
+    return panel(map, `<div class="chips">${here ? chip("Current map", "map", { ic: "var(--gold)" }) : chip("Switch to this map", "map", { ic: "var(--muted)", act: "vmap:" + map, outline: true })}
+      ${ROOMS[map].map(r => here ? chip(r, "cleaning_services", { act: "room:" + r }) : chip(r, "warning", { ic: "var(--muted)", dim: true, outline: true, act: "toast:Load the " + map + " map first" })).join("")}</div>`);
+  };
+  return `<div class="page stack">
+    ${heading("robot_2", "Cleaning", badge("water_drop", "", "var(--ok)") + badge("local_drink", "", "var(--ok)") + badge("bedtime", "", "var(--muted)") + badge("battery_full", "100%"))}
+    <div class="card map">${mapSvg()}</div>
+    ${tcard("robot_2", cleaning ? "var(--gold)" : "var(--ok)", cleaning ? "Segment cleaning" : "Docked · Charging",
+      cleaning ? "Kitchen · 4 min · 97 ft²" : "Last clean 7 days ago · 9 min · 112 ft²\n⚠ Sensors: clean in 23 h", { badge: "build", bc: "var(--warn)", act: "info:Opens the vacuum dialog (includes Locate)" })}
+    <div class="card deck"><div class="btns" style="grid-template-columns:repeat(4,1fr)">
+      ${btn("Clean", "play_arrow", "var(--gold)", "confirm:vac:Start cleaning the whole loaded map?")}
+      ${btn("Pause", "pause", cleaning ? "var(--gold)" : "var(--muted)", "vacpause")}
+      ${btn("Dock", "home", v.state === "docked" ? "var(--muted)" : "var(--ok)", "vacdock")}
+      ${btn("Routine", "auto_awesome", "var(--sky)", "confirm:vac:Run your Full cleaning routine now?")}</div>
+      <div class="chips center">${chip(v.mode, v.mode === "Vacuum" ? "cleaning_services" : "water_drop", { act: "vmode" })}${chip(v.suction, "mode_fan", { act: "info:Opens the suction picker" })}${chip(v.mode === "Vacuum" ? "Mop off" : "Mop high", "humidity_percentage", { ic: v.mode === "Vacuum" ? "var(--muted)" : "" })}</div></div>
+    ${roomPanel("Upstairs")}${roomPanel("Downstairs")}
+    ${tcard("build_circle", "var(--muted)", "Care & history", "Next: Sensors in 23 h", { act: "go:cleaning", badge: "chevron_right", bc: "var(--muted)" })}
+    ${dots("cln", 0, 3)}
+  </div>`;
+}
+function pageMower() {
+  const m = S.mower, mowing = m.state === "mowing";
+  const btn = (l, i, c, act) => `<button class="dbtn" data-act="${act}">${shape(i, c)}<span>${l}</span></button>`;
+  const care = (l, i, p) => chip(`${l} ${p}%`, i, { ic: p < 15 ? "var(--bad)" : p < 30 ? "var(--warn)" : "" });
+  return `<div class="page stack">
+    ${heading("grass", "Mower", badge("content_cut", m.blades + "%", "var(--bad)") + badge("battery_full", m.battery + "%"))}
+    ${tcard("robot_2", mowing ? "var(--gold)" : "var(--ok)", mowing ? "Mowing" : "Docked · Charged", mowing ? "6 min · 540 ft² so far" : "Last mow finished 2 days ago · 45 min · 3,100 ft²",
+      { badge: "content_cut", bc: "var(--bad)", act: "info:Opens the mower dialog" })}
+    <div class="card deck"><div class="btns" style="grid-template-columns:repeat(3,1fr)">
+      ${btn("Mow", "play_arrow", "var(--gold)", "confirm:mow:Start mowing now? Make sure the yard is clear of pets and people.")}
+      ${btn("Pause", "pause", mowing ? "var(--gold)" : "var(--muted)", "mowpause")}
+      ${btn("Dock", "home", m.state === "docked" ? "var(--muted)" : "var(--ok)", "mowdock")}</div></div>
+    ${panel("Care", `<div class="chips">${care("Blades", "content_cut", m.blades)}${care("Edge brush", "brush", 98)}${care("Trim line", "gesture", 95)}${care("Lens", "visibility", 100)}${chip("36 mows · 76 h · 80k ft²", "timeline", { ic: "var(--muted)" })}</div>`)}
+    ${dots("cln", 1, 3)}
+  </div>`;
+}
+function mediaBody() {
+  const p = (n, i, st) => chip(n, i, { ic: st === "playing" ? "var(--gold)" : st === "off" ? "var(--muted)" : "", act: "toast:" + n + " — volume, playback and inputs open here" });
+  return `${S.media.playing ? tcard("play_circle", "var(--gold)", "Nature documentary", "Netflix · on Sony TV", { act: "media" }) : tcard("music_off", "var(--muted)", "Nothing playing", "Tap a device below for its controls", { act: "media" })}
+    <div class="pgrid">
+      ${panel("TVs", `<div class="chips">${p("Sony TV", "tv", S.media.playing ? "playing" : "on")}${p("Samsung TV", "tv_off", "off")}</div>`)}
+      ${panel("Speakers", `<div class="chips">${p("Soundbar", "speaker", "on")}${p("Bedroom", "speaker", "off")}${p("Office", "speaker", "off")}</div>`)}
+      ${panel("Displays", `<div class="chips">${p("Kitchen", "tablet", "off")}${p("Great Room", "tablet", "off")}</div>`)}
+      ${panel("Groups", `<div class="chips">${p("Everywhere", "speaker_group", "off")}</div>`)}
+    </div>`;
+}
+function pageMedia() { return `<div class="page stack">${heading("speaker_group", "Media")}${mediaBody()}${dots("cln", 2, 3)}</div>`; }
+
+function dots(id, i, n) {
+  return `<div class="dots" data-dots="${id}">${Array.from({ length: n }, (_, k) => `<button aria-label="Page ${k + 1}" aria-current="${k === i}" data-act="page:${id}:${k}"></button>`).join("")}</div>`;
+}
+function swipe(id, pages) { return `<div class="swipe" id="sw-${id}">${pages.join("")}</div>`; }
+
+function viewHome() {
+  return `<div class="sections">
+    ${viewHeader()}
+    <section class="sec">${swipe("sec", [pageSecurity(), pageClimateMini()])}</section>
+    <section class="sec">${swipe("gar", [pageGarage(), pageLights()])}</section>
+    ${camerasSection()}
+    <section class="sec">${swipe("cln", [pageCleaning(), pageMower(), pageMedia()])}</section>
+  </div><p class="note">Prototype of the Home Panel dashboard · demo values, not live · swipe the cards sideways</p>`;
+}
+
+/* ---------------- sub-pages ---------------- */
+function dial(k, name, heatOrCool) {
+  const c = S.climate[k], on = c.mode !== "off", color = heatOrCool === "heat" ? "var(--warn)" : "var(--sky)";
+  const arc = on ? `<path d="M40 150 A 75 75 0 1 1 160 150" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="330" stroke-dashoffset="120"/>` : "";
+  return `<div class="card dial" style="--c:${color}">
+    <div class="t-prim">${name}</div>
+    <svg viewBox="0 0 200 170"><path d="M40 150 A 75 75 0 1 1 160 150" fill="none" stroke="var(--surface-2)" stroke-width="12" stroke-linecap="round"/>${arc}
+      <text x="100" y="78" text-anchor="middle" font-size="13" fill="var(--muted)">${on ? (heatOrCool === "heat" ? "Heating" : "Cooling") : "Idle"}</text>
+      <text x="100" y="112" text-anchor="middle" font-size="34" fill="var(--ink)">${on ? "70°" : "Off"}</text>
+      <text x="100" y="138" text-anchor="middle" font-size="13" fill="var(--muted)">🌡 ${c.cur} °F</text></svg>
+    <div class="seg"><button class="${heatOrCool}" aria-pressed="${on}" data-act="mode:${k}:${heatOrCool}">${ico(heatOrCool === "heat" ? "local_fire_department" : "ac_unit")}</button><button aria-pressed="${!on}" data-act="mode:${k}:off">${ico("power_settings_new")}</button></div>
+    <div class="seg">${["home", "directions_walk", "bed"].map((i, n) => { const p = ["home", "away", "sleep"][n]; return `<button aria-pressed="${c.preset === p}" data-act="preset:${k}:${p}">${ico(i)}</button>`; }).join("")}</div>
+  </div>`;
+}
+function viewClimate() {
+  const heat = S.climate.gr.mode === "heat", cool = S.climate.lr.mode === "cool";
+  const color = heat ? "var(--warn)" : cool ? "var(--sky)" : "var(--muted)";
+  const occ = on => chip("", "person", { ic: on ? "var(--gold)" : "var(--muted)", outline: !on });
+  return `<div class="stack" style="max-width:720px;margin:0 auto">
+    ${tcard("home_iot_device", color, "68° inside · 55° outside", `${heat ? "Heating" : "Heat off"} · ${cool ? "Cooling" : "Cooling off"}`)}
+    <div class="row2">${dial("gr", "Great Room", "heat")}${dial("lr", "Living Room", "cool")}</div>
+    <div class="pgrid">
+      ${panel("Great Room", `<div class="chips">${chip("67.6°", "device_thermostat")}${chip("64%", "humidity_percentage", { ic: "var(--warn)" })}</div>`)}
+      ${panel("Living Room", `<div class="chips">${chip("68.9°", "device_thermostat")}${chip("59%", "humidity_percentage")}${occ(false)}</div>`)}
+      ${panel("Bedroom", `<div class="chips">${chip("67.7°", "device_thermostat")}${occ(true)}</div>`)}
+      ${panel("Outside", `<div class="chips">${chip("Rainy · 57 °F", "rainy", { ic: "var(--sky)" })}</div>`)}
+    </div></div>`;
+}
+function viewLights() { return `<div class="stack" style="max-width:720px;margin:0 auto">${heading("light_group", "Lights & plugs", `<button class="badge btn" data-act="alloff">${ico("flashlight_off")}All off</button>`)}${lightsBody()}</div>`; }
+function viewMedia() { return `<div class="stack" style="max-width:720px;margin:0 auto">${heading("speaker_group", "Media")}${mediaBody()}</div>`; }
+function viewCleaningCare() {
+  const part = (n, h, life) => { const p = Math.round(h / life * 100), c = p <= 5 ? "var(--bad)" : p <= 20 ? "var(--warn)" : "var(--sky)";
+    return `<div class="card tcard" style="display:block"><div style="display:flex;gap:12px;align-items:center">${shape("build", c)}<div><div class="t-prim">${n}</div><div class="t-sec">${h} h left · ${p}%</div></div></div><div class="gauge" style="--c:${c}"><i style="width:${p}%"></i></div></div>`; };
+  return `<div class="stack" style="max-width:720px;margin:0 auto">
+    ${heading("build", "Care")}
+    <div class="row2">${part("Main brush", 194, 300)}${part("Side brush", 95, 200)}${part("Filter", 45, 150)}${part("Sensors", 23, 30)}</div>
+    ${heading("history", "History")}
+    ${tcard("timeline", "var(--gold)", "316 cleans · 105 h", "59.3k ft² lifetime · last run Sep 20, 2:16 PM")}
+    ${heading("map", "Maps")}
+    <div class="row2"><div class="card map" style="height:180px">${mapSvg()}</div><div class="card map" style="height:180px">${mapSvg()}</div></div></div>`;
+}
+function viewRooms() {
+  const rooms = ["Living Room", "Kitchen", "Bedroom", "Great Room", "Basement", "Office", "Garage", "Back Deck", "Driveway", "Front Gate", "Front Yard"];
+  return `<div class="stack" style="max-width:720px;margin:0 auto">${heading("grid_view", "Rooms")}<div class="pgrid">${rooms.map(r => `<button class="card tcard" data-act="toast:${r} room page (mirrors the live dashboard)">${shape("meeting_room", "var(--sky)")}<span class="txt"><div class="t-prim">${r}</div></span></button>`).join("")}</div></div>`;
+}
+
+/* ---------------- render ---------------- */
+const TITLES = { climate: "Climate", lights: "Lights & plugs", media: "Media", cleaning: "Cleaning" };
+function renderBar() {
+  const sub = TITLES[S.view];
+  $("#bar").innerHTML = sub
+    ? `<button class="icon" data-act="go:home" aria-label="Back">${ico("arrow_back")}</button><div class="title">${sub}</div><span class="proto-tag">Prototype</span>`
+    : `<button class="icon" aria-label="Menu" data-act="toast:Sidebar">${ico("menu")}</button><nav class="tabs">
+        ${[["home", "home"], ["rooms", "grid_view"], ["cameras", "videocam"]].map(([v, i]) => `<button class="tab" data-act="tab:${v}" aria-label="${v}" aria-current="${S.view === v ? "page" : "false"}">${ico(i)}</button>`).join("")}
+       </nav><span class="proto-tag">Prototype</span>`;
+}
+const scrollPos = {};
+function render() {
+  document.querySelectorAll(".swipe").forEach(s => scrollPos[s.id] = s.scrollLeft);
+  renderBar();
+  const v = S.view;
+  $("#main").innerHTML = v === "home" ? viewHome() : v === "climate" ? viewClimate() : v === "lights" ? viewLights() : v === "media" ? viewMedia()
+    : v === "cleaning" ? viewCleaningCare() : v === "rooms" ? viewRooms() : `<div class="sections">${camerasSection(true)}</div>`;
+  document.querySelectorAll(".swipe").forEach(s => {
+    if (scrollPos[s.id]) s.scrollLeft = scrollPos[s.id];
+    s.addEventListener("scroll", () => {
+      const i = Math.round(s.scrollLeft / s.clientWidth);
+      s.querySelectorAll(".dots button").forEach((b, k) => b.setAttribute("aria-current", String(k === i)));
+    }, { passive: true });
+  });
+}
+
+function toast(msg) {
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; $("#layer").append(t);
+  setTimeout(() => t.remove(), 2400);
+}
+function confirmBox(text, onYes) {
+  $("#layer").innerHTML = `<div class="scrim"><div class="dialog" role="dialog" aria-modal="true"><p>${text}</p><div class="acts"><button data-dlg="no">Cancel</button><button class="go" data-dlg="yes">Continue</button></div></div></div>`;
+  $("#layer").onclick = e => { const b = e.target.closest("[data-dlg]"); if (!b) return; $("#layer").innerHTML = ""; $("#layer").onclick = null; if (b.dataset.dlg === "yes") onYes(); };
+}
+
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]"); if (!el) return;
+  const raw = el.dataset.act, [act, a, b] = raw.split(":");
+  const arg = raw.includes(":") ? raw.slice(raw.indexOf(":") + 1) : "";
+  switch (act) {
+    case "go": S.view = a; render(); scrollTo(0, 0); break;
+    case "tab": S.view = a; render(); scrollTo(0, 0); break;
+    case "toast": toast(arg); break;
+    case "info": toast(arg); break;
+    case "page": { const sw = $("#sw-" + a); sw.scrollTo({ left: sw.clientWidth * Number(b), behavior: "smooth" }); break; }
+    case "light": S.lights[a].on = !S.lights[a].on; render(); break;
+    case "laundry": S.laundryOn = S.laundryOn ? 0 : 6; render(); break;
+    case "alloff": Object.values(S.lights).forEach(l => l.on = false); S.laundryOn = 0; render(); toast("All lights and plugs off"); break;
+    case "presence": {
+      S.presence[a] = !S.presence[a];
+      if (a === "kitchen") { S.lights.c1.on = S.lights.c2.on = S.presence.kitchen; toast(S.presence.kitchen ? "Kitchen occupied → ceiling lights on (after sunset)" : "Kitchen clear → lights off after 10 min"); }
+      else { S.laundryOn = S.presence.basement ? 6 : 0; toast(S.presence.basement ? "Basement occupied → all 6 lights on" : "Basement clear → lights off after 2 min"); }
+      render(); break;
+    }
+    case "alarm":
+      if (a === "disarmed") confirmBox("Disarm the Abode alarm?", () => { S.alarm = "disarmed"; render(); });
+      else { S.alarm = a; render(); toast(a === "armed_home" ? "Alarm armed: Home" : "Alarm armed: Away"); }
+      break;
+    case "lock": confirmBox(S.lock === "locked" ? "Unlock the front door?" : "Lock the front door?", () => { S.lock = S.lock === "locked" ? "unlocked" : "locked"; render(); }); break;
+    case "outfit":
+      S.outfit.thinking = true; render();
+      setTimeout(() => { S.outfit.thinking = false; S.outfit.shownAt = Date.now(); render(); }, 1400); break;
+    case "confirm": {
+      const [what, text] = [a, arg.slice(arg.indexOf(":") + 1)];
+      confirmBox(text, () => { if (what === "vac") S.vac.state = "cleaning"; else S.mower.state = "mowing"; render(); });
+      break;
+    }
+    case "vacpause": if (S.vac.state === "cleaning") { S.vac.state = "paused"; render(); } break;
+    case "vacdock": S.vac.state = "docked"; render(); break;
+    case "mowpause": if (S.mower.state === "mowing") { S.mower.state = "paused"; render(); } break;
+    case "mowdock": S.mower.state = "docked"; render(); break;
+    case "vmode": S.vac.mode = S.vac.mode === "Vacuum" ? "Vac & Mop" : "Vacuum"; render(); toast("In the live dashboard this opens the mode picker"); break;
+    case "vmap": confirmBox(`Switch the vacuum to the ${a} map? Only do this when it is on that floor.`, () => { S.vac.map = a; render(); }); break;
+    case "room": confirmBox(`Clean the ${a} now?`, () => { S.vac.state = "cleaning"; render(); toast(a + ": segment clean started"); }); break;
+    case "mode": S.climate[a].mode = b; render(); break;
+    case "preset": S.climate[a].preset = b; render(); break;
+    case "media": S.media.playing = !S.media.playing; render(); break;
+  }
+});
+setInterval(() => { if (S.view === "home" && !document.querySelector(".scrim")) render(); }, 30000);
+render();
+</script>

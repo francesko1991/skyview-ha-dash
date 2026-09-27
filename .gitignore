@@ -1,0 +1,25 @@
+# Never commit Home Assistant credentials (they are stored outside the workspace, but be safe)
+.env
+*.env
+*credential*.xml
+secrets.yaml
+*token*
+# Encrypted Home Assistant backup copies (scripts/run-backup-copy.ps1); never commit
+ha-backups/
+*.tar
+*.tar.part
+
+# Real data pulled from Home Assistant (people, devices, locations); keep local only
+inventory/
+ha-dashboard/live/
+ha-dashboard/backups/
+ha-dashboard/outfit/payloads/
+maintenance/reports/
+maintenance/CHANGES.md
+
+# Local Claude Code settings
+.claude/
+
+# Python
+__pycache__/
+*.pyc

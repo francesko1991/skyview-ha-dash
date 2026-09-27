@@ -1,0 +1,127 @@
+# Home Panel theme v2 - "Twilight sky" (dark) and "Morning sky" (light).
+# Every colour, surface, corner and background used by the Home Panel dashboard lives here.
+#
+# To restyle: edit the hp-* tokens at the top of each mode. The block under
+# "Home Assistant and Mushroom mapping" wires those tokens into HA and Mushroom; it rarely
+# needs changing. Keep both modes' mapping blocks identical.
+#
+# Needs: /config/www/backgrounds/twilight.svg and morning.svg (served as /local/backgrounds/...).
+# Install: this file goes in /config/themes/, then run the frontend.reload_themes action.
+# Previous version: home_panel.v1.yaml (in the project folder).
+
+Home Panel:
+  modes:
+    dark:
+      # ---- Twilight sky tokens -------------------------------------------------
+      hp-ground: "#0B1222"                    # page colour behind the image
+      hp-surface: "rgba(19, 28, 48, 0.86)"    # cards: navy glass over the sky
+      hp-surface-2: "#1B2640"                 # controls inside cards
+      hp-line: "rgba(160, 180, 220, 0.16)"    # hairline borders
+      hp-ink: "#E9EEF7"                       # main text
+      hp-muted: "#93A0BA"                     # secondary text, calm icons
+      hp-gold: "#D9BE86"                      # champagne: lights and things that are on
+      hp-sky: "#8FC3EE"                       # sky blue: climate, media, vacuum
+      hp-ok: "#8CCBA8"                        # sage: locked, fine
+      hp-warn: "#E8C07A"                      # amber: needs a look
+      hp-bad: "#E99A92"                       # rose: problem, unlocked
+      hp-rgb-muted: "147, 160, 186"           # Mushroom needs "r, g, b" triplets
+      hp-rgb-gold: "217, 190, 134"
+      hp-rgb-ok: "140, 203, 168"
+      hp-rgb-warn: "232, 192, 122"
+      hp-rgb-bad: "233, 154, 146"
+      hp-shadow: "0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.18)"
+      hp-radius: "16px"
+      hp-background: "center / cover no-repeat fixed url('/local/backgrounds/twilight.svg')"
+      # ---- Home Assistant and Mushroom mapping ------------------------------------
+      lovelace-background: "var(--hp-background)"
+      primary-background-color: "var(--hp-ground)"
+      card-background-color: "var(--hp-surface)"
+      ha-card-background: "var(--hp-surface)"
+      secondary-background-color: "var(--hp-surface-2)"
+      divider-color: "var(--hp-line)"
+      ha-card-border-color: "var(--hp-line)"
+      ha-card-border-radius: "var(--hp-radius)"
+      ha-card-box-shadow: "var(--hp-shadow)"
+      primary-text-color: "var(--hp-ink)"
+      secondary-text-color: "var(--hp-muted)"
+      primary-color: "var(--hp-gold)"
+      accent-color: "var(--hp-gold)"
+      error-color: "var(--hp-bad)"
+      warning-color: "var(--hp-warn)"
+      success-color: "var(--hp-ok)"
+      state-light-active-color: "var(--hp-gold)"
+      state-switch-active-color: "var(--hp-gold)"
+      state-climate-heat-color: "var(--hp-gold)"
+      state-climate-cool-color: "var(--hp-sky)"
+      state-media_player-active-color: "var(--hp-sky)"
+      state-vacuum-active-color: "var(--hp-sky)"
+      state-lock-locked-color: "var(--hp-ok)"
+      state-lock-unlocked-color: "var(--hp-bad)"
+      state-lock-jammed-color: "var(--hp-bad)"
+      state-lock-open-color: "var(--hp-bad)"
+      mush-chip-background: "var(--hp-surface)"
+      mush-chip-border-color: "var(--hp-line)"
+      mush-chip-border-width: "1px"
+      mush-chip-border-radius: "999px"
+      mush-rgb-teal: "var(--hp-rgb-muted)"    # chips use teal for "all fine" -> calm, neutral
+      mush-rgb-grey: "var(--hp-rgb-muted)"
+      mush-rgb-yellow: "var(--hp-rgb-gold)"    # Mushroom chips "yellow" = champagne
+      mush-rgb-amber: "var(--hp-rgb-warn)"
+      mush-rgb-red: "var(--hp-rgb-bad)"
+    light:
+      # ---- Morning sky tokens --------------------------------------------------
+      hp-ground: "#EEF2F8"
+      hp-surface: "rgba(255, 255, 255, 0.82)"
+      hp-surface-2: "#E6ECF4"
+      hp-line: "rgba(40, 60, 100, 0.12)"
+      hp-ink: "#16213A"
+      hp-muted: "#5D6A84"
+      hp-gold: "#A8843F"
+      hp-sky: "#2F6FA8"
+      hp-ok: "#3F7D5C"
+      hp-warn: "#9A6A00"
+      hp-bad: "#B3473C"
+      hp-rgb-muted: "93, 106, 132"
+      hp-rgb-gold: "168, 132, 63"
+      hp-rgb-ok: "63, 125, 92"
+      hp-rgb-warn: "154, 106, 0"
+      hp-rgb-bad: "179, 71, 60"
+      hp-shadow: "0 1px 2px rgba(22, 33, 58, 0.06), 0 8px 24px rgba(22, 33, 58, 0.08)"
+      hp-radius: "16px"
+      hp-background: "center / cover no-repeat fixed url('/local/backgrounds/morning.svg')"
+      # ---- Home Assistant and Mushroom mapping ------------------------------------
+      lovelace-background: "var(--hp-background)"
+      primary-background-color: "var(--hp-ground)"
+      card-background-color: "var(--hp-surface)"
+      ha-card-background: "var(--hp-surface)"
+      secondary-background-color: "var(--hp-surface-2)"
+      divider-color: "var(--hp-line)"
+      ha-card-border-color: "var(--hp-line)"
+      ha-card-border-radius: "var(--hp-radius)"
+      ha-card-box-shadow: "var(--hp-shadow)"
+      primary-text-color: "var(--hp-ink)"
+      secondary-text-color: "var(--hp-muted)"
+      primary-color: "var(--hp-gold)"
+      accent-color: "var(--hp-gold)"
+      error-color: "var(--hp-bad)"
+      warning-color: "var(--hp-warn)"
+      success-color: "var(--hp-ok)"
+      state-light-active-color: "var(--hp-gold)"
+      state-switch-active-color: "var(--hp-gold)"
+      state-climate-heat-color: "var(--hp-gold)"
+      state-climate-cool-color: "var(--hp-sky)"
+      state-media_player-active-color: "var(--hp-sky)"
+      state-vacuum-active-color: "var(--hp-sky)"
+      state-lock-locked-color: "var(--hp-ok)"
+      state-lock-unlocked-color: "var(--hp-bad)"
+      state-lock-jammed-color: "var(--hp-bad)"
+      state-lock-open-color: "var(--hp-bad)"
+      mush-chip-background: "var(--hp-surface)"
+      mush-chip-border-color: "var(--hp-line)"
+      mush-chip-border-width: "1px"
+      mush-chip-border-radius: "999px"
+      mush-rgb-teal: "var(--hp-rgb-muted)"
+      mush-rgb-grey: "var(--hp-rgb-muted)"
+      mush-rgb-yellow: "var(--hp-rgb-gold)"    # Mushroom chips "yellow" = champagne
+      mush-rgb-amber: "var(--hp-rgb-warn)"
+      mush-rgb-red: "var(--hp-rgb-bad)"
